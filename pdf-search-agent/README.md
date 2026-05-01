@@ -60,4 +60,3 @@ pdf-search-agent/
 
 This repository is currently in an early stage.
 The structure, tools, and implementation details are still subject to discussion and improvement.
-```
