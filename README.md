@@ -1,93 +1,100 @@
-# Code
+````markdown
+# PDF Search Agent
 
+A modular Retrieval-Augmented Generation (RAG) system that answers questions
+based on uploaded PDF documents and supports its answers with citations.
 
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git.rz.tu-bs.de/isf/sep/sep-2026/iai_drpsa_pdf-search-agent_g1/code.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://git.rz.tu-bs.de/isf/sep/sep-2026/iai_drpsa_pdf-search-agent_g1/code/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
+> **Note:** This is only an initial project structure and setup proposal.
+> It is not final and can still be changed during development if the team finds a better solution.
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+The PDF Search Agent allows users to upload PDF documents, ask questions, and receive
+answers that are grounded in the document content and supported by citations.
+If no sufficient evidence is found, the system will abstain from answering instead of
+generating an unsupported response.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+The system is built as a modular pipeline so that each component can be developed,
+tested, and improved independently.
+
+## Project Structure
+
+```text
+pdf-search-agent/
+├── app/
+│   ├── parser.py          # Initial idea: PDF ingestion and text extraction
+│   ├── chunker.py         # Initial idea: text chunking strategies
+│   ├── indexer.py         # Initial idea: vector indexing
+│   ├── retriever.py       # Initial idea: chunk retrieval
+│   ├── generator.py       # Initial idea: answer generation with citations
+│   └── pipeline.py        # Initial idea: full RAG pipeline
+├── evaluation/            # Evaluation metrics, benchmarks, and test scripts
+├── ui/
+│   └── streamlit_app.py   # Initial idea for a simple user interface
+├── data/                  # PDF storage and sample files
+├── tests/                 # Unit tests and integration tests
+└── requirements.txt
+```
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+> The following setup is a first proposal and may be adapted later.
+
+Requirements:
+- Python 3.10 or higher
+- pip
+
+Steps:
+
+1. Clone the repository:
+```bash
+git clone https://git.rz.tu-bs.de/isf/sep/sep-2026/iai_drpsa_pdf-search-agent_g1/code.git
+cd code
+```
+
+2. Create and activate a virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Run the application:
+```bash
+streamlit run ui/streamlit_app.py
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Then open your browser and go to `http://localhost:8501`.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+From there you can:
+- Upload PDF documents
+- Enter questions
+- View answers with citations or abstention messages
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## Features
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+> This list is not final. Features may be added, removed, or refined as the project develops.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+- PDF ingestion and parsing
+- Semantic chunk retrieval
+- Citation-supported answers
+- Abstention when evidence is insufficient
+- Modular and testable pipeline
+- Evaluation suite with documented metrics
 
-## License
-For open source projects, say how it is licensed.
+## Project Status
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This repository is currently in an early stage.
+The structure, tools, and implementation details are still subject to discussion and improvement.
+
+## Authors
+
+Group 1 — PDF Search Agent
+Software Engineering Praktikum 2026, TU Braunschweig
+````
