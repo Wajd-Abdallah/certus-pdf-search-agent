@@ -22,17 +22,12 @@ from dataclasses import dataclass, field
 
 from parser import PDFParser
 
-# -------------------------------------------------------------------
-# Logging
-# -------------------------------------------------------------------
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# -------------------------------------------------------------------
-# Data Model
-# -------------------------------------------------------------------
 
 @dataclass
 class TextChunk:
@@ -72,9 +67,8 @@ class TextChunk:
     embedding_vector: list = field(default_factory=list)
 
 
-# -------------------------------------------------------------------
+
 # Fixed Size Chunker
-# -------------------------------------------------------------------
 
 class FixedSizeChunker:
     """
@@ -110,8 +104,7 @@ class FixedSizeChunker:
         self.chunk_size = chunk_size
         self.overlap = overlap
 
-    # -------------------------------------------------------------------
-
+   
     def chunk(
         self,
         text: str,
@@ -156,9 +149,9 @@ class FixedSizeChunker:
         return chunks
 
 
-# -------------------------------------------------------------------
-# Recursive Chunker (recommended)
-# -------------------------------------------------------------------
+
+# Recursive Chunker
+
 
 class RecursiveChunker:
     """
@@ -193,7 +186,7 @@ class RecursiveChunker:
         self.chunk_size = chunk_size
         self.overlap = overlap
 
-    # -------------------------------------------------------------------
+     
 
     def _hard_split(self, text: str) -> list[str]:
         """
@@ -215,7 +208,7 @@ class RecursiveChunker:
             )
         ]
 
-    # -------------------------------------------------------------------
+    
 
     def _split_text(
         self,
@@ -253,7 +246,7 @@ class RecursiveChunker:
 
         return results
 
-    # -------------------------------------------------------------------
+
 
     def _merge_with_overlap(
         self,
@@ -306,7 +299,6 @@ class RecursiveChunker:
 
         return chunks
 
-    # -------------------------------------------------------------------
 
     def chunk(
         self,
@@ -351,9 +343,7 @@ class RecursiveChunker:
         return final_chunks
 
 
-# -------------------------------------------------------------------
 # Main pipeline function
-# -------------------------------------------------------------------
 
 def parse_and_chunk(
     file_path: str,
@@ -367,7 +357,7 @@ def parse_and_chunk(
     Parse a PDF and return all text chunks.
 
     Parameters
-    ----------
+    
     file_path : str
         Path to the PDF file
 
@@ -375,7 +365,7 @@ def parse_and_chunk(
         Chunking strategy
 
     Returns
-    -------
+    
     list[TextChunk]
         All generated chunks
     """

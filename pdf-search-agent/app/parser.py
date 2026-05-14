@@ -25,17 +25,16 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 
-# -------------------------------------------------------------------
 # Logging
-# -------------------------------------------------------------------
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# -------------------------------------------------------------------
+
 # Data Model
-# -------------------------------------------------------------------
+
 
 @dataclass
 class DocumentData:
@@ -71,9 +70,7 @@ class DocumentData:
     storage_path: str
 
 
-# -------------------------------------------------------------------
 # PDF Parser
-# -------------------------------------------------------------------
 
 class PDFParser:
     """
@@ -111,9 +108,9 @@ class PDFParser:
 
         path = Path(file_path).resolve()
 
-        # -----------------------------------------------------------
+        
         # Basic validation
-        # -----------------------------------------------------------
+        
 
         if not path.exists():
             raise FileNotFoundError(f"File not found: {file_path}")
@@ -126,9 +123,8 @@ class PDFParser:
         if path.stat().st_size == 0:
             raise ValueError(f"PDF '{path.name}' is empty.")
 
-        # -----------------------------------------------------------
         # Create document metadata
-        # -----------------------------------------------------------
+    
 
         document = DocumentData(
             document_id=str(uuid.uuid4()),
@@ -139,9 +135,7 @@ class PDFParser:
             storage_path=str(path),
         )
 
-        # -----------------------------------------------------------
         # Open and parse PDF
-        # -----------------------------------------------------------
 
         try:
             with fitz.open(str(path)) as doc:
@@ -196,7 +190,6 @@ class PDFParser:
                 f"Could not open PDF '{path.name}': {exc}"
             ) from exc
 
-    # -------------------------------------------------------------------
 
     def parse_multiple(
         self,
@@ -234,4 +227,4 @@ class PDFParser:
                     exc,
                 )
 
-        return results
+        return results,
