@@ -1,0 +1,59 @@
+çç≈from app.generator import generateAnswer
+
+
+def testNormalAnswer():
+    # Test 1: Normal answer with relevant chunks
+    chunks = [
+        {'text': 'RAG stands for Retrieval Augmented Generation. It retrieves relevant documents before generating an answer.', 'source': 'paper1.pdf', 'page': 3},
+        {'text': 'RAG reduces hallucinations by grounding answers in real documents.', 'source': 'paper1.pdf', 'page': 5}
+    ]
+
+    result = generateAnswer('What is RAG?', chunks)
+
+    print('=== Test 1: Normal Answer ===')
+    print('Answer:', result['answer'])
+    print('Citations:', result['citations'])
+    print('Abstained:', result['abstained'])
+
+    assert result['abstained'] == False
+    assert len(result['citations']) > 0
+    print('Test 1 passed!\n')
+
+
+def testAbstentionNoChunks():
+    # Test 2: Abstention - no chunks at all
+    result = generateAnswer('What is the capital of France?', [])
+
+    print('=== Test 2: Abstention - empty chunks ===')
+    print('Answer:', result['answer'])
+    print('Citations:', result['citations'])
+    print('Abstained:', result['abstained'])
+
+    assert result['abstained'] == True
+    assert result['citations'] == []
+    print('Test 2 passed!\n')
+
+
+def testAbstentionIrrelevantChunks():
+    # Test 3: Abstention - chunks exist but question not answerable
+    chunks = [
+        {'text': 'RAG stands for Retrieval Augmented Generation.', 'source': 'paper1.pdf', 'page': 3}
+    ]
+
+    result = generateAnswer('What is the capital of France?', chunks)
+
+    print('=== Test 3: Abstention - irrelevant chunks ===')
+    print('Answer:', result['answer'])
+    print('Citations:', result['citations'])
+    print('Abstained:', result['abstained'])
+
+    assert result['abstained'] == True
+    assert result['citations'] == []
+    print('Test 3 passed!\n')
+
+
+if __name__ == '__main__':
+    testNormalAnswer()
+    testAbstentionNoChunks()
+    testAbstentionIrrelevantChunks()
+    print('All tests passed!')
