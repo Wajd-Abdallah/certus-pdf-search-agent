@@ -345,7 +345,7 @@ class RecursiveChunker:
 
 # Main pipeline function
 
-def parse_and_chunk(
+def parseAndChunk(
     file_path: str,
     chunker: (
         FixedSizeChunker
