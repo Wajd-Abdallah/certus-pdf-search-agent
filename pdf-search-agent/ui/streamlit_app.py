@@ -389,12 +389,60 @@ def generate_answer(question: str, docs: dict):
             "error": "Please upload and index a PDF document first before asking a question.",
         }
 
-    unanswerable_keywords = [
-        "weather", "stock", "president", "ceo", "recipe",
-        "capital of", "today", "news", "sport", "film",
+    completed_docs = [
+        name for name, meta in docs.items()
+        if meta.get("status") == "completed"
     ]
+    doc_name = completed_docs[0] if completed_docs else "uploaded document"
 
-    if any(keyword in q_lower for keyword in unanswerable_keywords):
+    # --- DEMO CASE 3 — conflicting answers (must be before Case 1) ---
+    if any(k in q_lower for k in ["best chunk", "chunk size", "optimal chunk",
+                                    "split", "better search"]):
+        time.sleep(2)
+        return {
+            "text": (
+                "The uploaded document contains conflicting information on this question. "
+                "On page 5, the document states that a chunk size of 256 tokens produces "
+                "better retrieval precision for short queries. "
+                "However, on page 12, the document recommends a chunk size of 512 tokens "
+                "for longer and more complex queries. "
+                "Since both passages directly contradict each other, the system cannot "
+                "provide a single definitive answer without risking a misleading response. "
+                "Both sources are cited below for your reference."
+            ),
+            "citations": [
+                {"doc": doc_name, "page": 5},
+                {"doc": doc_name, "page": 12},
+            ],
+            "abstain": False,
+            "error": None,
+        }
+
+    # --- DEMO CASE 1 — normal answer with citation ---
+    if any(k in q_lower for k in ["rag", "retrieval", "augmented", "generation",
+                                    "chunking", "chunk", "pipeline", "embedding"]):
+        time.sleep(2)
+        return {
+            "text": (
+                "Retrieval-Augmented Generation (RAG) is a method that combines "
+                "document retrieval with language model generation. Instead of relying "
+                "on the model's internal knowledge, RAG first retrieves relevant passages "
+                "from the uploaded documents and then generates an answer grounded in "
+                "that content. This ensures that answers are accurate and traceable."
+            ),
+            "citations": [
+                {"doc": doc_name, "page": 3},
+                {"doc": doc_name, "page": 7},
+            ],
+            "abstain": False,
+            "error": None,
+        }
+
+    # --- DEMO CASE 2 — abstention ---
+    if any(k in q_lower for k in ["weather", "stock", "president", "ceo", "recipe",
+                                    "capital", "today", "news", "sport", "film",
+                                    "football", "bitcoin", "temperature"]):
+        time.sleep(1)
         return {
             "text": "",
             "citations": [],
@@ -402,12 +450,8 @@ def generate_answer(question: str, docs: dict):
             "error": None,
         }
 
-    completed_docs = [
-        name for name, meta in docs.items()
-        if meta.get("status") == "completed"
-    ]
-    doc_name = completed_docs[0] if completed_docs else "uploaded document"
-
+    # --- DEFAULT ---
+    time.sleep(2)
     return {
         "text": (
             "Based on the uploaded document, the PDF Search Agent follows a "
@@ -415,11 +459,10 @@ def generate_answer(question: str, docs: dict):
             "will be extracted, divided into chunks, indexed, searched, and then used to "
             "generate an answer that is grounded in the document."
         ),
-        "citations": [{"doc": doc_name, "page": "prototype"}],
+        "citations": [{"doc": doc_name, "page": 1}],
         "abstain": False,
         "error": None,
     }
-
 
 def reset_app():
     st.session_state.uploaded_docs = {}
@@ -496,7 +539,6 @@ with st.sidebar:
     if st.button("Reset prototype", use_container_width=True):
         reset_app()
         st.rerun()
-
 
 # Main area
 tab_search, tab_admin = st.tabs(["🔍 Search", "⚙️ Administration & Evaluation"])
