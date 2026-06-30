@@ -1,65 +1,18 @@
-"""
-parser.py
-=========
-PDF ingestion and text extraction using PyMuPDF.
-
-Responsibilities
-----------------
-- Load PDF files from disk
-- Extract clean text per page
-- Handle broken/invalid PDFs gracefully (Q80)
-
-Output
-------
-- DocumentData
-- dict[int, str]  (page number -> extracted text)
-"""
-
-from __future__ import annotations
-
-import logging
-import uuid
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-
-import fitz  # PyMuPDF
-
-# Logging
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from datetime import datetime
+import uuid
+import fitz
 
 
-
-# Data Model
-
+# ==========================================================
+# DocumentData
+# ==========================================================
 
 @dataclass
 class DocumentData:
     """
-    Metadata of an ingested PDF document.
-
-    Attributes
-    ----------
-    document_id : str
-        Unique identifier (UUID)
-
-    file_name : str
-        Original file name
-
-    upload_date : str
-        ISO-8601 timestamp of ingestion
-
-    file_size : int
-        File size in bytes
-
-    file_type : str
-        MIME type (always application/pdf)
-
-    storage_path : str
-        Absolute file path on disk
+    Stores metadata of one uploaded PDF document.
     """
 
     document_id: str
@@ -70,145 +23,90 @@ class DocumentData:
     storage_path: str
 
 
-# PDF Parser
+# ==========================================================
+# PDFParser
+# ==========================================================
 
 class PDFParser:
     """
-    PDF parser using PyMuPDF.
-
-    Example
-    -------
-    >>> parser = PDFParser()
-    >>> document, pages = parser.parse("example.pdf")
-    >>> print(pages[1])
+    Validates PDF files and extracts text page by page.
     """
 
     def parse(self, file_path: str) -> tuple[DocumentData, dict[int, str]]:
         """
-        Parse a single PDF file.
+        Parses one PDF.
 
-        Parameters
-        ----------
-        file_path : str
-            Path to the PDF file.
-
-        Returns
-        -------
-        tuple[DocumentData, dict[int, str]]
-            Document metadata and extracted page texts.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the file does not exist.
-
-        ValueError
-            If the file is invalid or unreadable.
+        Returns:
+            (
+                DocumentData,
+                {
+                    page_number: page_text
+                }
+            )
         """
 
-        path = Path(file_path).resolve()
+        path = Path(file_path)
 
-        
-        # Basic validation
-        
-
+        # -----------------------------
+        # Validation
+        # -----------------------------
         if not path.exists():
             raise FileNotFoundError(f"File not found: {file_path}")
 
         if path.suffix.lower() != ".pdf":
-            raise ValueError(
-                f"Expected a PDF file, got '{path.suffix}'"
-            )
+            raise ValueError("Only PDF files are allowed.")
 
         if path.stat().st_size == 0:
-            raise ValueError(f"PDF '{path.name}' is empty.")
+            raise ValueError("The PDF file is empty.")
 
-        # Create document metadata
-    
-
+        # -----------------------------
+        # Create metadata
+        # -----------------------------
         document = DocumentData(
             document_id=str(uuid.uuid4()),
             file_name=path.name,
-            upload_date=datetime.utcnow().isoformat() + "Z",
+            upload_date=datetime.now().isoformat(),
             file_size=path.stat().st_size,
             file_type="application/pdf",
-            storage_path=str(path),
+            storage_path=str(path.resolve())
         )
 
-        # Open and parse PDF
+        pages: dict[int, str] = {}
 
+        # -----------------------------
+        # Extract text
+        # -----------------------------
         try:
-            with fitz.open(str(path)) as doc:
+            with fitz.open(file_path) as pdf:
 
-                if doc.page_count == 0:
-                    raise ValueError(
-                        f"PDF '{path.name}' contains no pages."
-                    )
+                for page_number, page in enumerate(pdf, start=1):
 
-                pages: dict[int, str] = {}
+                    text = page.get_text("text").strip()
 
-                for page_num in range(doc.page_count):
+                    # Skip empty pages
+                    if not text:
+                        continue
 
-                    try:
-                        page = doc.load_page(page_num)
+                    pages[page_number] = text
 
-                        # Extract plain text
-                        text = page.get_text("text")
+        except Exception as error:
+            raise ValueError(f"PDF parsing failed: {error}")
 
-                        # Clean whitespace
-                        cleaned_text = " ".join(text.split())
+        if not pages:
+            raise ValueError("No readable text found in the PDF.")
 
-                        # Skip empty pages
-                        if cleaned_text:
-                            pages[page_num + 1] = cleaned_text
+        return document, pages
 
-                    except Exception as exc:
-                        logger.warning(
-                            "Could not read page %s in '%s': %s",
-                            page_num + 1,
-                            path.name,
-                            exc,
-                        )
-
-                if not pages:
-                    raise ValueError(
-                        f"No readable text found in '{path.name}'."
-                    )
-
-                logger.info(
-                    "Successfully parsed '%s' (%s pages)",
-                    path.name,
-                    len(pages),
-                )
-
-                return document, pages
-
-        except fitz.FileDataError as exc:
-            # ← NUR echte PyMuPDF-Fehler werden hier gefangen,
-            #   nicht unsere eigenen ValueErrors von oben
-            raise ValueError(
-                f"Could not open PDF '{path.name}': {exc}"
-            ) from exc
-
+    # ======================================================
 
     def parse_multiple(
         self,
-        file_paths: list[str],
+        file_paths: list[str]
     ) -> list[tuple[DocumentData, dict[int, str]]]:
         """
-        Parse multiple PDF files.
+        Parses multiple PDF files.
 
-        Invalid files are skipped instead of crashing the pipeline.
-
-        Parameters
-        ----------
-        file_paths : list[str]
-            List of PDF paths.
-
-        Returns
-        -------
-        list[tuple[DocumentData, dict[int, str]]]
-            Successfully parsed documents.
+        Invalid PDFs are skipped with a warning.
         """
 
         results = []
@@ -216,15 +114,9 @@ class PDFParser:
         for file_path in file_paths:
 
             try:
-                parsed = self.parse(file_path)
-                results.append(parsed)
+                results.append(self.parse(file_path))
 
-            except (FileNotFoundError, ValueError) as exc:
+            except Exception as error:
+                print(f"Warning: Skipping '{file_path}': {error}")
 
-                logger.warning(
-                    "Skipping '%s': %s",
-                    file_path,
-                    exc,
-                )
-
-        return results,
+        return results

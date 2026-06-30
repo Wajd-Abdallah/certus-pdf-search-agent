@@ -1,52 +1,44 @@
-from __future__ import annotations
-import logging
-from typing import List
-
 import chromadb
-from chromadb.utils import embedding_functions
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
-from app.chunker import TextChunk
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from src.chunker import TextChunk
 
 
 class Indexer:
     def __init__(
         self,
         collection_name: str = "pdf_chunks",
-        persist_directory: str = "./data/chroma_db",
+        persist_directory: str = "./data/chroma_db"
     ) -> None:
-        self.embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        self.collection_name = collection_name
+        self.persist_directory = persist_directory
+
+        self.embedding_fn = SentenceTransformerEmbeddingFunction(
             model_name="all-MiniLM-L6-v2"
         )
 
-        self.client = chromadb.PersistentClient(path=persist_directory)
+        self.client = chromadb.PersistentClient(
+            path=self.persist_directory
+        )
 
         self.collection = self.client.get_or_create_collection(
-            name=collection_name,
-            embedding_function=self.embedding_fn,
+            name=self.collection_name,
+            embedding_function=self.embedding_fn
         )
 
-        logger.info(
-            "Indexer ready — collection '%s' at '%s'",
-            collection_name,
-            persist_directory,
-        )
-
-    def index_chunks(self, chunks: List[TextChunk]) -> None:
+    def index_chunks(self, chunks: list[TextChunk]) -> None:
         if not chunks:
-            logger.warning("No chunks to index.")
-            return
+            raise ValueError("No chunks provided for indexing.")
 
         ids = [chunk.chunk_id for chunk in chunks]
         documents = [chunk.text_content for chunk in chunks]
+
         metadatas = [
             {
                 "document_id": chunk.document_id,
-                "page_number": chunk.page_number,
                 "chunk_index": chunk.chunk_index,
                 "token_count": chunk.token_count,
+                "page_number": chunk.page_number,
             }
             for chunk in chunks
         ]
@@ -54,57 +46,43 @@ class Indexer:
         self.collection.add(
             ids=ids,
             documents=documents,
-            metadatas=metadatas,
+            metadatas=metadatas
         )
 
-        logger.info("Indexed %s chunks.", len(chunks))
+    def search(self, query: str, top_k: int) -> list[dict]:
+        if not query.strip():
+            raise ValueError("Query must not be empty.")
 
-    def search(self, query: str, top_k: int = 5) -> List[dict]:
         results = self.collection.query(
             query_texts=[query],
-            n_results=max(top_k * 8, 20),
+            n_results=top_k
         )
 
-        raw_output = []
+        output = []
 
+        ids = results.get("ids", [[]])[0]
         documents = results.get("documents", [[]])[0]
         metadatas = results.get("metadatas", [[]])[0]
         distances = results.get("distances", [[]])[0]
 
-        for i in range(len(documents)):
-            metadata = metadatas[i] or {}
-
-            raw_output.append(
+        for chunk_id, document, metadata, distance in zip(
+            ids, documents, metadatas, distances
+        ):
+            output.append(
                 {
-                    "text": documents[i],
-                    "document_id": metadata.get("document_id"),
-                    "page_number": metadata.get("page_number"),
-                    "distance": distances[i],
+                    "chunk_id": chunk_id,
+                    "text_content": document,
+                    "metadata": metadata,
+                    "distance": distance,
                 }
             )
 
-        seen_texts = set()
-        deduplicated = []
+        return output
 
-        for item in raw_output:
-            text_key = item["text"].strip()
-            if text_key not in seen_texts:
-                seen_texts.add(text_key)
-                deduplicated.append(item)
+    def clear(self) -> None:
+        self.client.delete_collection(self.collection_name)
 
-        query_lower = query.lower()
-        prioritize_first_page = any(
-            keyword in query_lower for keyword in ["title", "author", "abstract"]
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection_name,
+            embedding_function=self.embedding_fn
         )
-
-        if prioritize_first_page:
-            deduplicated.sort(
-                key=lambda x: (
-                    x["page_number"] if x["page_number"] is not None else 9999,
-                    x["distance"],
-                )
-            )
-        else:
-            deduplicated.sort(key=lambda x: x["distance"])
-
-        return deduplicated[:top_k]
