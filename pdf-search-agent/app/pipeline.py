@@ -1,88 +1,86 @@
+from __future__ import annotations
+
 import logging
+from typing import List
+
+from app.chunker import parseAndChunk
 from app.generator import generateAnswer
+from app.indexer import Indexer
+from app.retriever import Retriever
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Global shared instances for the baseline
+indexer = Indexer()
+retriever = Retriever(indexer=indexer)
+
 
 def processPdf(filePath: str) -> dict:
-    # Process a PDF file through the full pipeline
     try:
-        from app.chunker import parseAndChunk
         chunks = parseAndChunk(filePath)
 
         if not chunks:
             return {
-                'success': False,
-                'message': f'No text could be extracted from {filePath}'
+                "success": False,
+                "message": f"No readable text could be extracted from {filePath}",
+                "num_chunks": 0,
             }
 
-        # Step 2: Index chunks (connect when indexer.py is ready)
-        try:
-            from app.indexer import index_chunks
-            index_chunks(chunks)
-            logger.info("Chunks indexed successfully.")
-        except Exception as e:
-            logger.warning(f"Indexer not ready yet: {e}")
+        indexer.index_chunks(chunks)
+
+        logger.info("Successfully processed and indexed %s chunks.", len(chunks))
 
         return {
-            'success': True,
-            'message': f'Successfully processed {len(chunks)} chunks from {filePath}'
+            "success": True,
+            "message": f"Successfully processed {len(chunks)} chunks from {filePath}",
+            "num_chunks": len(chunks),
         }
 
     except Exception as e:
+        logger.exception("Error while processing PDF.")
         return {
-            'success': False,
-            'message': f'Error processing PDF: {str(e)}'
+            "success": False,
+            "message": f"Error processing PDF: {str(e)}",
+            "num_chunks": 0,
         }
 
 
-def convertChunks(rawChunks: list) -> list:
-    # Convert chunks to generator format: {'text', 'source', 'page'}
-    # Handles both TextChunk objects and plain dictionaries.
+def convertChunks(rawChunks: List[dict]) -> list:
+    """
+    Normalize retrieval output into generator input format:
+    {'text', 'source', 'page'}
+    """
     converted = []
 
     for chunk in rawChunks:
-        # If chunk is a TextChunk object
-        if hasattr(chunk, 'text_content'):
-            converted.append({
-                'text': chunk.text_content,
-                'source': chunk.document_id,
-                'page': chunk.page_number
-            })
-        # If chunk is already a dictionary
-        elif isinstance(chunk, dict):
-            converted.append({
-                'text': chunk.get('text', chunk.get('text_content', '')),
-                'source': chunk.get('source', chunk.get('document_id', 'Unknown')),
-                'page': chunk.get('page', chunk.get('page_number', '?'))
-            })
+        converted.append(
+            {
+                "text": chunk.get("text", ""),
+                "source": chunk.get("document_id", "Unknown"),
+                "page": chunk.get("page_number", "?"),
+            }
+        )
 
     return converted
 
 
 def answerQuestion(question: str, topK: int = 5) -> dict:
-    # Answer a question based on indexed documents.
+    """
+    Full QA pipeline:
+    retrieve -> convert -> generate
+    """
     try:
-        # Step 1: Retrieve relevant chunks
-        try:
-            from app.retriever import retrieve_chunks
-            rawChunks = retrieve_chunks(question, topK)
-        except Exception as e:
-            logger.warning(f"Retriever not ready yet: {e}")
-            rawChunks = []
-
-        # Step 2: Convert chunks to generator format
+        rawChunks = retriever.retrieve(question, top_k=topK)
         chunks = convertChunks(rawChunks)
-
-        # Step 3: Generate answer
         result = generateAnswer(question, chunks)
 
         return result
 
     except Exception as e:
+        logger.exception("Error while answering question.")
         return {
-            'answer': f'An error occurred: {str(e)}',
-            'citations': [],
-            'abstained': True
+            "answer": f"An error occurred: {str(e)}",
+            "citations": [],
+            "abstained": True,
         }

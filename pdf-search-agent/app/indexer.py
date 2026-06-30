@@ -1,25 +1,22 @@
-# from __future__ import annotations
-
+from __future__ import annotations
 import logging
 from typing import List
 
 import chromadb
 from chromadb.utils import embedding_functions
 
-from chunker import TextChunk
+from app.chunker import TextChunk
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class Indexer:
-
     def __init__(
         self,
         collection_name: str = "pdf_chunks",
         persist_directory: str = "./data/chroma_db",
     ) -> None:
-
         self.embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
             model_name="all-MiniLM-L6-v2"
         )
@@ -38,7 +35,6 @@ class Indexer:
         )
 
     def index_chunks(self, chunks: List[TextChunk]) -> None:
-
         if not chunks:
             logger.warning("No chunks to index.")
             return
@@ -64,30 +60,51 @@ class Indexer:
         logger.info("Indexed %s chunks.", len(chunks))
 
     def search(self, query: str, top_k: int = 5) -> List[dict]:
-
         results = self.collection.query(
             query_texts=[query],
-            n_results=top_k,
+            n_results=max(top_k * 8, 20),
         )
 
-        output = []
+        raw_output = []
 
-        for i in range(len(results["documents"][0])):
-            output.append(
+        documents = results.get("documents", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        distances = results.get("distances", [[]])[0]
+
+        for i in range(len(documents)):
+            metadata = metadatas[i] or {}
+
+            raw_output.append(
                 {
-                    "text": results["documents"][0][i],
-                    "document_id": results["metadatas"][0][i]["document_id"],
-                    "page_number": results["metadatas"][0][i]["page_number"],
-                    "score": results["distances"][0][i],
+                    "text": documents[i],
+                    "document_id": metadata.get("document_id"),
+                    "page_number": metadata.get("page_number"),
+                    "distance": distances[i],
                 }
             )
 
-        return output
+        seen_texts = set()
+        deduplicated = []
 
-    def clear(self) -> None:
+        for item in raw_output:
+            text_key = item["text"].strip()
+            if text_key not in seen_texts:
+                seen_texts.add(text_key)
+                deduplicated.append(item)
 
-        self.collection.delete(
-            where={"chunk_index": {"$gte": 0}}
+        query_lower = query.lower()
+        prioritize_first_page = any(
+            keyword in query_lower for keyword in ["title", "author", "abstract"]
         )
 
-        logger.info("Index cleared.")Chunks speichern / indexiereng
+        if prioritize_first_page:
+            deduplicated.sort(
+                key=lambda x: (
+                    x["page_number"] if x["page_number"] is not None else 9999,
+                    x["distance"],
+                )
+            )
+        else:
+            deduplicated.sort(key=lambda x: x["distance"])
+
+        return deduplicated[:top_k]

@@ -20,7 +20,7 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 
-from parser import PDFParser
+from app.parser import PDFParser
 
 
 

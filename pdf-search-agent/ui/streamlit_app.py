@@ -1,6 +1,9 @@
 import streamlit as st
 import time
 from datetime import datetime
+from pathlib import Path
+
+from app.pipeline import processPdf, answerQuestion
 
 # Basic page setup
 st.set_page_config(
@@ -38,14 +41,12 @@ html, body, [class*="css"] {
     font-weight: 800;
 }
 [data-testid="stSidebar"] .stMarkdown h2 {
-
     font-size: 2.0rem !important;
     font-weight: 800 !important;
     color: #e3efb6 !important;
     letter-spacing: 0.03em !important;
     text-transform: none !important;
     line-height: 1.3 !important;
-
 }
 .main .block-container {
     padding-top: 1.7rem;
@@ -218,7 +219,7 @@ html, body, [class*="css"] {
 div[data-testid="stForm"] {
     border: none !important;
     border-radius: 22px !important;
-    padding:0.8rem 0.8rem 0.8rem0.8rem !important;
+    padding: 0.8rem !important;
     background: #ffffff !important;
     box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
@@ -226,7 +227,7 @@ div[data-testid="stForm"] {
 /* Input field: no border */
 .stTextInput input {
     font-size: 1.05rem !important;
-    padding: 10 1.2rem !important;
+    padding: 10px 1.2rem !important;
     height: 2.5rem !important;
     min-height: 2.5rem !important;
     border-radius: 16px !important;
@@ -244,7 +245,7 @@ div[data-testid="stForm"] {
     box-shadow: none !important;
 }
 
-/* Placeholder centered and readable */
+/* Placeholder */
 .stTextInput input::placeholder {
     font-size: 1rem !important;
     color: #647244 !important;
@@ -270,7 +271,6 @@ div[data-testid="stForm"] {
     color: white !important;
 }
 
-
 section[data-testid="stFileUploader"] {
     background: rgba(255,255,255,0.08) !important;
     border: 1px solid #738747 !important;
@@ -278,13 +278,12 @@ section[data-testid="stFileUploader"] {
     padding: 0.6rem !important;
 }
 
-/* Alles im Uploader standardmäßig dunkel */
+/* File uploader text */
 section[data-testid="stFileUploader"],
 section[data-testid="stFileUploader"] * {
     color: #1f280c !important;
 }
 
-/* Button selbst */
 section[data-testid="stFileUploader"] button {
     color: #1f280c !important;
     border: 1px solid #aeb79a !important;
@@ -293,7 +292,6 @@ section[data-testid="stFileUploader"] button {
     opacity: 1 !important;
 }
 
-/* Text im Button */
 section[data-testid="stFileUploader"] button * {
     color: #1f280c !important;
     fill: #1f280c !important;
@@ -301,7 +299,6 @@ section[data-testid="stFileUploader"] button * {
     opacity: 1 !important;
 }
 
-/* Der Hinweistext wie "200MB per file" */
 section[data-testid="stFileUploader"] small,
 section[data-testid="stFileUploader"] label,
 section[data-testid="stFileUploader"] p,
@@ -311,7 +308,6 @@ section[data-testid="stFileUploader"] div {
     opacity: 1 !important;
 }
 
-/* Falls Streamlit disabled/opake Styles setzt */
 section[data-testid="stFileUploader"] [disabled],
 section[data-testid="stFileUploader"] .disabled,
 section[data-testid="stFileUploader"] button:disabled {
@@ -319,6 +315,7 @@ section[data-testid="stFileUploader"] button:disabled {
     opacity: 1 !important;
     -webkit-text-fill-color: #1f280c !important;
 }
+
 /* Prototype note */
 .prototype-note {
     font-size: 1rem;
@@ -330,11 +327,14 @@ section[data-testid="stFileUploader"] button:disabled {
     unsafe_allow_html=True,
 )
 
+WELCOME_TEXT = "Hey, first upload your PDF. Then ask a question about it, and I’ll answer based on the document."
+
 # Session variables
 if "uploaded_docs" not in st.session_state:
     st.session_state.uploaded_docs = {}
 
-WELCOME_TEXT = "Hey, first upload your PDF. Then ask a question about it, and I’ll answer based on the document."
+if "uploaded_file_paths" not in st.session_state:
+    st.session_state.uploaded_file_paths = {}
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
@@ -358,114 +358,65 @@ def has_indexed_pdf() -> bool:
     )
 
 
-def process_pdf(uploaded_file):
-    file_name = uploaded_file.name
-    if not file_name.lower().endswith(".pdf"):
-        return False, f"{file_name} is not a PDF file. Please upload a valid PDF."
-    raw_file = uploaded_file.read()
-    if len(raw_file) < 10:
-        return False, f"{file_name} seems to be empty or corrupted."
-    if not raw_file.startswith(b"%PDF"):
-        return False, f"{file_name} is not a valid PDF file."
-    size_kb = round(len(raw_file) / 1024, 1)
-    st.session_state.uploaded_docs[file_name] = {
-        "status": "indexing",
-        "size_kb": size_kb,
-        "upload_time": datetime.now().strftime("%H:%M:%S"),
-    }
-    time.sleep(0.6)
-    st.session_state.uploaded_docs[file_name]["status"] = "completed"
-    return True, None
-
-
-def generate_answer(question: str, docs: dict):
-    q_lower = question.lower().strip()
-
-    if not has_indexed_pdf():
-        return {
-            "text": "",
-            "citations": [],
-            "abstain": False,
-            "error": "Please upload and index a PDF document first before asking a question.",
-        }
-
-    completed_docs = [
-        name for name, meta in docs.items()
-        if meta.get("status") == "completed"
-    ]
-    doc_name = completed_docs[0] if completed_docs else "uploaded document"
-
-    # --- DEMO CASE 3 — conflicting answers (must be before Case 1) ---
-    if any(k in q_lower for k in ["best chunk", "chunk size", "optimal chunk",
-                                    "split", "better search"]):
-        time.sleep(2)
-        return {
-            "text": (
-                "The uploaded document contains conflicting information on this question. "
-                "On page 5, the document states that a chunk size of 256 tokens produces "
-                "better retrieval precision for short queries. "
-                "However, on page 12, the document recommends a chunk size of 512 tokens "
-                "for longer and more complex queries. "
-                "Since both passages directly contradict each other, the system cannot "
-                "provide a single definitive answer without risking a misleading response. "
-                "Both sources are cited below for your reference."
-            ),
-            "citations": [
-                {"doc": doc_name, "page": 5},
-                {"doc": doc_name, "page": 12},
-            ],
-            "abstain": False,
-            "error": None,
-        }
-
-    # --- DEMO CASE 1 — normal answer with citation ---
-    if any(k in q_lower for k in ["rag", "retrieval", "augmented", "generation",
-                                    "chunking", "chunk", "pipeline", "embedding"]):
-        time.sleep(2)
-        return {
-            "text": (
-                "Retrieval-Augmented Generation (RAG) is a method that combines "
-                "document retrieval with language model generation. Instead of relying "
-                "on the model's internal knowledge, RAG first retrieves relevant passages "
-                "from the uploaded documents and then generates an answer grounded in "
-                "that content. This ensures that answers are accurate and traceable."
-            ),
-            "citations": [
-                {"doc": doc_name, "page": 3},
-                {"doc": doc_name, "page": 7},
-            ],
-            "abstain": False,
-            "error": None,
-        }
-
-    # --- DEMO CASE 2 — abstention ---
-    if any(k in q_lower for k in ["weather", "stock", "president", "ceo", "recipe",
-                                    "capital", "today", "news", "sport", "film",
-                                    "football", "bitcoin", "temperature"]):
-        time.sleep(1)
-        return {
-            "text": "",
-            "citations": [],
-            "abstain": True,
-            "error": None,
-        }
-
-    # --- DEFAULT ---
-    time.sleep(2)
+def format_backend_answer(result: dict) -> dict:
     return {
-        "text": (
-            "Based on the uploaded document, the PDF Search Agent follows a "
-            "Retrieval-Augmented Generation approach. In the final system, the PDF content "
-            "will be extracted, divided into chunks, indexed, searched, and then used to "
-            "generate an answer that is grounded in the document."
-        ),
-        "citations": [{"doc": doc_name, "page": 1}],
-        "abstain": False,
+        "text": result.get("answer", ""),
+        "citations": [
+            {
+                "doc": citation.get("source", "Unknown"),
+                "page": citation.get("page", "?"),
+            }
+            for citation in result.get("citations", [])
+        ],
+        "abstain": result.get("abstained", False),
         "error": None,
     }
 
+
+def process_pdf(uploaded_file):
+    file_name = uploaded_file.name
+
+    if not file_name.lower().endswith(".pdf"):
+        return False, f"{file_name} is not a PDF file. Please upload a valid PDF."
+
+    raw_file = uploaded_file.read()
+
+    if len(raw_file) < 10:
+        return False, f"{file_name} seems to be empty or corrupted."
+
+    if not raw_file.startswith(b"%PDF"):
+        return False, f"{file_name} is not a valid PDF file."
+
+    upload_dir = Path("data/uploaded_pdfs")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_path = upload_dir / file_name
+
+    with open(safe_path, "wb") as f:
+        f.write(raw_file)
+
+    st.session_state.uploaded_docs[file_name] = {
+        "status": "indexing",
+        "size_kb": round(len(raw_file) / 1024, 1),
+        "upload_time": datetime.now().strftime("%H:%M:%S"),
+    }
+
+    st.session_state.uploaded_file_paths[file_name] = str(safe_path)
+
+    result = processPdf(str(safe_path))
+
+    if result["success"]:
+        st.session_state.uploaded_docs[file_name]["status"] = "completed"
+        st.session_state.uploaded_docs[file_name]["num_chunks"] = result.get("num_chunks", 0)
+        return True, None
+    else:
+        st.session_state.uploaded_docs[file_name]["status"] = "error"
+        return False, result["message"]
+
+
 def reset_app():
     st.session_state.uploaded_docs = {}
+    st.session_state.uploaded_file_paths = {}
     st.session_state.chat_history = [
         {
             "role": "agent",
@@ -524,7 +475,7 @@ with st.sidebar:
     <span class="status-pill {status_class}">{status_label}</span>
 </div>
 <div style="font-size:0.82rem;color:#edf7c8;padding:2px 0 10px 0;">
-    {meta.get('size_kb', '-')} KB · uploaded at {meta.get('upload_time', '-')}
+    {meta.get('size_kb', '-')} KB · uploaded at {meta.get('upload_time', '-')} · chunks: {meta.get('num_chunks', '-')}
 </div>
 """,
                 unsafe_allow_html=True,
@@ -621,6 +572,7 @@ with tab_search:
                 {
                     "timestamp": datetime.now().strftime("%H:%M:%S"),
                     "query": "",
+                    "answer": "",
                     "abstained": False,
                     "response_time_s": 0,
                     "num_citations": 0,
@@ -652,6 +604,7 @@ with tab_search:
                 {
                     "timestamp": datetime.now().strftime("%H:%M:%S"),
                     "query": q,
+                    "answer": "",
                     "abstained": False,
                     "response_time_s": 0,
                     "num_citations": 0,
@@ -672,9 +625,10 @@ with tab_search:
 
         with st.spinner("Searching in the uploaded PDF..."):
             start_time = time.time()
-            answer = generate_answer(q, st.session_state.uploaded_docs)
+            backend_result = answerQuestion(q, topK=5)
             response_time = round(time.time() - start_time, 2)
 
+        answer = format_backend_answer(backend_result)
         answer["role"] = "agent"
         answer["response_time"] = response_time
         st.session_state.chat_history.append(answer)
@@ -683,15 +637,16 @@ with tab_search:
             {
                 "timestamp": datetime.now().strftime("%H:%M:%S"),
                 "query": q,
-                "abstained": answer.get("abstain", False),
+                "answer": backend_result.get("answer", ""),
+                "citations": backend_result.get("citations", []),
+                "abstained": backend_result.get("abstained", False),
                 "response_time_s": response_time,
-                "num_citations": len(answer.get("citations", [])),
-                "error": answer.get("error"),
+                "num_citations": len(backend_result.get("citations", [])),
+                "error": None,
             }
         )
 
         st.rerun()
-
 
 with tab_admin:
     st.markdown(
@@ -755,6 +710,6 @@ with tab_admin:
     st.markdown("---")
     st.subheader("Prototype note")
     st.markdown(
-        '<div class="prototype-note">This version is mainly a frontend prototype. The PDF validation and indexing are currently simulated. In the final version, this interface should be connected to the real backend pipeline for parsing, chunking, retrieval, answer generation, citations, and abstention handling.</div>',
+        '<div class="prototype-note">This version is now connected to the real backend pipeline for PDF processing, indexing, retrieval, answer generation, citations, and abstention handling. The next step is to improve logging, evaluation runs, and configuration-based execution.</div>',
         unsafe_allow_html=True,
     )
