@@ -1,4 +1,4 @@
-from schemas import Citation
+from app.schemas import Citation
 
 
 def formatCitation(source: str, page, chunk_id=None) -> dict:

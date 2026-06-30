@@ -1,0 +1,25 @@
+run:
+  name: baseline_v1
+  output_dir: results
+
+models:
+  embedding_model: all-MiniLM-L6-v2
+  llm_model: llama3.2
+
+retrieval:
+  top_k: 5
+
+chunking:
+  chunk_size: 500
+  chunk_overlap: 100
+
+index:
+  collection_name: pdf_chunks
+  persist_directory: ./data/chroma_db
+
+prompt:
+  version: v1
+
+evaluation:
+  questions_file: evaluation/sample_questions.json
+  max_questions: 5
