@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import uuid
 
-from src.parser import PDFParser
+from app.parser import PDFParser
 
 
 @dataclass

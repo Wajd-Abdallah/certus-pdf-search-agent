@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
-from src.chunker import TextChunk
+from app.chunker import TextChunk
 
 
 class Indexer:

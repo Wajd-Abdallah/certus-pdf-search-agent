@@ -1,4 +1,4 @@
-from src.chunker import parseAndChunk
+from app.chunker import parseAndChunk
 
 chunks = parseAndChunk("02a_Pflichtenheft.pdf")
 

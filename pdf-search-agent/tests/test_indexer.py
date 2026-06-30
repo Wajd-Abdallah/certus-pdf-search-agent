@@ -1,5 +1,5 @@
-from src.chunker import parseAndChunk
-from src.indexer import Indexer
+from app.chunker import parseAndChunk
+from app.indexer import Indexer
 
 chunks = parseAndChunk("02a_Pflichtenheft.pdf")
 
