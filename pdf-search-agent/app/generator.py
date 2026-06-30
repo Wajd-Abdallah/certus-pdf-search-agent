@@ -1,13 +1,13 @@
 import ollama
 
+from app.citation_formatter import formatCitations, extractContexts
+from app.abstention import ABSTAIN_MESSAGE, isAbstained, buildAbstentionOutput
+from app.schemas import Prediction
+
 
 def generateAnswer(question: str, chunks: list) -> dict:
     if not chunks:
-        return {
-            "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
-            "citations": [],
-            "abstained": True,
-        }
+        return buildAbstentionOutput(question)
 
     context = buildContext(chunks)
 
@@ -19,57 +19,57 @@ Context from documents:
 Question: {question}
 
 Instructions:
-- Answer using only the information from the context above.
-- If the context does not contain enough information, respond with exactly:
-  "I could not find enough evidence in the uploaded documents to answer this question."
-- Do not make up any information.
-- Be concise and clear.
+- Answer only using the information from the context above.
+- Do not use external knowledge.
+- Do not make up information.
+- If the context does not contain enough information, respond exactly with:
+"{ABSTAIN_MESSAGE}"
+- Keep the answer concise and clear.
 
 Answer:"""
 
-    response = ollama.chat(
-        model="llama3.2",
-        messages=[{"role": "user", "content": prompt}],
+    try:
+        response = ollama.chat(
+            model="llama3.2",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+        )
+        answer = response["message"]["content"].strip()
+
+    except Exception:
+        return buildAbstentionOutput(question, reason="generation_error")
+
+    abstained = isAbstained(answer)
+    retrieved_contexts = extractContexts(chunks)
+    citations = formatCitations(chunks) if not abstained else []
+
+    prediction = Prediction(
+        question=question,
+        answer=answer,
+        citations=citations,
+        abstained=abstained,
+        abstention_reason="insufficient_context" if abstained else None,
+        retrieved_contexts=retrieved_contexts,
     )
 
-    answer = response["message"]["content"].strip()
-    abstained = "could not find enough evidence" in answer.lower()
-
-    if abstained:
-        citations = []
-    else:
-        citations = extractCitations(chunks)
-
-    return {
-        "answer": answer,
-        "citations": citations,
-        "abstained": abstained,
-    }
+    return prediction.toDict()
 
 
 def buildContext(chunks: list) -> str:
     contextParts = []
 
-    for chunk in chunks:
-        source = chunk.get("source", "Unknown")
-        page = chunk.get("page", "?")
-        text = chunk.get("text", "")
-        contextParts.append(f"[Source: {source}, Page: {page}]\n{text}")
+    for index, chunk in enumerate(chunks):
+        source = chunk.get("source") or chunk.get("document") or "Unknown"
+        page = chunk.get("page") or chunk.get("page_number") or "?"
+        chunk_id = chunk.get("chunk_id") or chunk.get("id") or f"chunk_{index}"
+        text = chunk.get("text") or chunk.get("content") or ""
+
+        contextParts.append(
+            f"[Document: {source}, Page: {page}, Chunk ID: {chunk_id}]\n{text}"
+        )
 
     return "\n\n".join(contextParts)
-
-
-def extractCitations(chunks: list) -> list:
-    citations = []
-    seen = set()
-
-    for chunk in chunks:
-        source = chunk.get("source", "Unknown")
-        page = chunk.get("page", "?")
-        key = f"{source}_p{page}"
-
-        if key not in seen:
-            seen.add(key)
-            citations.append({"source": source, "page": page})
-
-    return citations
