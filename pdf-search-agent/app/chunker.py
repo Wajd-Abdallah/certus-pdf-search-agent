@@ -8,6 +8,7 @@ from app.parser import PDFParser
 class TextChunk:
     chunk_id: str
     document_id: str
+    document_name: str
     text_content: str
     chunk_index: int
     token_count: int
@@ -25,6 +26,7 @@ class FixedSizeChunker:
         text: str,
         page_number: int,
         document_id: str,
+        document_name: str,
         start_index: int
     ) -> list[TextChunk]:
 
@@ -49,6 +51,7 @@ class FixedSizeChunker:
                 TextChunk(
                     chunk_id=str(uuid.uuid4()),
                     document_id=document_id,
+                    document_name=document_name,
                     text_content=chunk_text,
                     chunk_index=index,
                     token_count=len(chunk_words),
@@ -73,6 +76,7 @@ class RecursiveChunker:
         text: str,
         page_number: int,
         document_id: str,
+        document_name: str,
         start_index: int
     ) -> list[TextChunk]:
 
@@ -92,6 +96,7 @@ class RecursiveChunker:
                 TextChunk(
                     chunk_id=str(uuid.uuid4()),
                     document_id=document_id,
+                    document_name=document_name,
                     text_content=segment,
                     chunk_index=index,
                     token_count=len(words),
@@ -103,7 +108,7 @@ class RecursiveChunker:
             index += 1
 
         if not chunks:
-            return self._hard_split(text, page_number, document_id, start_index)
+            return self._hard_split(text, page_number, document_id, document_name, start_index)
 
         return chunks
 
@@ -157,6 +162,7 @@ class RecursiveChunker:
         text: str,
         page_number: int,
         document_id: str,
+        document_name: str,
         start_index: int
     ) -> list[TextChunk]:
 
@@ -165,6 +171,7 @@ class RecursiveChunker:
             text=text,
             page_number=page_number,
             document_id=document_id,
+            document_name=document_name,
             start_index=start_index
         )
 
@@ -188,6 +195,7 @@ def parseAndChunk(
             text=text,
             page_number=page_number,
             document_id=document_data.document_id,
+            document_name=document_data.file_name,
             start_index=global_chunk_index
         )
 

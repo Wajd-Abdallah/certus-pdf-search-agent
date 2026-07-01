@@ -18,13 +18,21 @@ class Retriever:
             logger.warning("Empty query received.")
             return []
 
-        results = self.indexer.search(query=query, top_k=top_k)
+        results = self.indexer.search(
+            query=query,
+            top_k=top_k
+        )
 
-        logger.info("Retrieved %s chunks for query: '%s'", len(results), query)
+        logger.info(
+            "Retrieved %s chunks for query: '%s'",
+            len(results),
+            query,
+        )
 
-        print("\n=== RETRIEVED RESULTS ===")
-        for i, result in enumerate(results, 1):
-            print(f"\n--- Result {i} ---")
-            print(result)
+        logger.info("===== RETRIEVED RESULTS =====")
+
+        for i, result in enumerate(results, start=1):
+            logger.info("----- Result %d -----", i)
+            logger.info("%s", result)
 
         return results
