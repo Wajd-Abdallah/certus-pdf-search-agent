@@ -1,0 +1,6 @@
+{
+  "Recall@k": 0.0,
+  "MRR": 0.0,
+  "nDCG@k": 0.0,
+  "num_questions": 2
+}

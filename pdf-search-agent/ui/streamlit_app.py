@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+
+# Make sure the project root (parent of ui/) is on the import path,
+# so "from app...." imports work no matter how/where streamlit is launched from.
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import streamlit as st
 import time
 from datetime import datetime
@@ -363,8 +370,8 @@ def format_backend_answer(result: dict) -> dict:
         "text": result.get("answer", ""),
         "citations": [
             {
-                "doc": citation.get("source", "Unknown"),
-                "page": citation.get("page", "?"),
+                "doc": citation.get("document", "Unknown"),
+                "page": citation.get("page_number", "?"),
             }
             for citation in result.get("citations", [])
         ],
@@ -625,7 +632,7 @@ with tab_search:
 
         with st.spinner("Searching in the uploaded PDF..."):
             start_time = time.time()
-            backend_result = answerQuestion(q, topK=5)
+            backend_result = answerQuestion(q, top_k=5)
             response_time = round(time.time() - start_time, 2)
 
         answer = format_backend_answer(backend_result)

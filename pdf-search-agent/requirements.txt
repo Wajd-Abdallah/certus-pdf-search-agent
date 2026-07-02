@@ -2,4 +2,4 @@ streamlit
 pymupdf          # PDF parsing (aka fitz)
 langchain
 chromadb         # Vector-Datenbank (lokal, kein Account nötig)
-sentence-transformers  # Embeddings lokal, kein API-Key nötig
+sentence-transformers  # Embeddings lokal, kein API-Key nötigpyyaml

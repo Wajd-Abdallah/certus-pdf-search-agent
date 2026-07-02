@@ -1,48 +1,66 @@
+"""
+Splits parsed PDF page text into TextChunk objects ready for embedding.
+Depends on app/parser.py (PDFParser) for the (DocumentData, {page: text}) input.
+"""
+
 from dataclasses import dataclass, field
 import uuid
 
 from app.parser import PDFParser
 
 
+# ==========================================================
+# TextChunk
+# ==========================================================
 @dataclass
 class TextChunk:
     chunk_id: str
     document_id: str
-    document_name: str
+    document_name: str  # original filename, needed for citations later
     text_content: str
     chunk_index: int
-    token_count: int
+    token_count: int  # NOTE: this is a WORD count approximation, not a real tokenizer count
     page_number: int
     embedding_vector: list = field(default_factory=list)
 
 
+# ==========================================================
+# FixedSizeChunker
+# ==========================================================
 class FixedSizeChunker:
-    chunk_size: int = 400
-    overlap: int = 50
-    MIN_WORDS: int = 20
+    """
+    Splits text into fixed-size overlapping windows, measured in words.
+    """
+
+    def __init__(self, chunk_size: int = 400, overlap: int = 50, min_words: int = 20):
+        if overlap >= chunk_size:
+            raise ValueError("overlap must be smaller than chunk_size")
+        self.chunk_size = chunk_size
+        self.overlap = overlap
+        self.min_words = min_words
 
     def chunk(
         self,
         text: str,
         page_number: int,
         document_id: str,
-        document_name: str,
-        start_index: int
+        start_index: int,
+        document_name: str = "",
     ) -> list[TextChunk]:
 
         words = text.split()
 
-        if len(words) < self.MIN_WORDS:
+        if len(words) < self.min_words:
             return []
 
         chunks = []
         index = start_index
-        step = self.chunk_size - self.overlap
+        step = self.chunk_size - self.overlap  # always > 0, validated in __init__
 
         for start in range(0, len(words), step):
             chunk_words = words[start:start + self.chunk_size]
 
-            if len(chunk_words) < self.MIN_WORDS:
+            if len(chunk_words) < self.min_words:
                 continue
 
             chunk_text = " ".join(chunk_words)
@@ -65,22 +83,41 @@ class FixedSizeChunker:
         return chunks
 
 
+# ==========================================================
+# RecursiveChunker
+# ==========================================================
 class RecursiveChunker:
-    chunk_size: int = 400
-    overlap: int = 50
-    SEPARATORS: list[str] = ["\n\n", "\n", ". ", " "]
-    MIN_WORDS: int = 20
+    """
+    Splits text on natural boundaries (paragraph -> line -> sentence -> word)
+    before falling back to fixed-size chunking.
+    """
+
+    DEFAULT_SEPARATORS = ["\n\n", "\n", ". ", " "]
+
+    def __init__(
+        self,
+        chunk_size: int = 400,
+        overlap: int = 50,
+        min_words: int = 20,
+        separators: list[str] | None = None,
+    ):
+        if overlap >= chunk_size:
+            raise ValueError("overlap must be smaller than chunk_size")
+        self.chunk_size = chunk_size
+        self.overlap = overlap
+        self.min_words = min_words
+        self.separators = separators if separators is not None else list(self.DEFAULT_SEPARATORS)
 
     def chunk(
         self,
         text: str,
         page_number: int,
         document_id: str,
-        document_name: str,
-        start_index: int
+        start_index: int,
+        document_name: str = "",
     ) -> list[TextChunk]:
 
-        segments = self._split_text(text, self.SEPARATORS)
+        segments = self._split_text(text, self.separators)
         merged_segments = self._merge_with_overlap(segments)
 
         chunks = []
@@ -89,7 +126,7 @@ class RecursiveChunker:
         for segment in merged_segments:
             words = segment.split()
 
-            if len(words) < self.MIN_WORDS:
+            if len(words) < self.min_words:
                 continue
 
             chunks.append(
@@ -108,7 +145,7 @@ class RecursiveChunker:
             index += 1
 
         if not chunks:
-            return self._hard_split(text, page_number, document_id, document_name, start_index)
+            return self._hard_split(text, page_number, document_id, start_index, document_name)
 
         return chunks
 
@@ -138,7 +175,7 @@ class RecursiveChunker:
 
     def _merge_with_overlap(self, segments: list[str]) -> list[str]:
         merged = []
-        current_words = []
+        current_words: list[str] = []
 
         for segment in segments:
             words = segment.split()
@@ -162,25 +199,33 @@ class RecursiveChunker:
         text: str,
         page_number: int,
         document_id: str,
-        document_name: str,
-        start_index: int
+        start_index: int,
+        document_name: str = "",
     ) -> list[TextChunk]:
-
-        fixed_chunker = FixedSizeChunker()
+        fixed_chunker = FixedSizeChunker(
+            chunk_size=self.chunk_size,
+            overlap=self.overlap,
+            min_words=self.min_words,
+        )
         return fixed_chunker.chunk(
             text=text,
             page_number=page_number,
             document_id=document_id,
+            start_index=start_index,
             document_name=document_name,
-            start_index=start_index
         )
 
 
-def parseAndChunk(
+# ==========================================================
+# parse_and_chunk
+# ==========================================================
+def parse_and_chunk(
     file_path: str,
     chunker: FixedSizeChunker | RecursiveChunker | None = None
 ) -> list[TextChunk]:
-
+    """
+    Parses one PDF and splits it into TextChunks.
+    """
     if chunker is None:
         chunker = RecursiveChunker()
 
@@ -195,8 +240,8 @@ def parseAndChunk(
             text=text,
             page_number=page_number,
             document_id=document_data.document_id,
+            start_index=global_chunk_index,
             document_name=document_data.file_name,
-            start_index=global_chunk_index
         )
 
         all_chunks.extend(page_chunks)
@@ -206,3 +251,8 @@ def parseAndChunk(
         raise ValueError("No chunks could be created from the document.")
 
     return all_chunks
+
+
+# Backward-compatible alias in case other files still import the old camelCase name.
+# TODO: remove once all callers use parse_and_chunk().
+parseAndChunk = parse_and_chunk

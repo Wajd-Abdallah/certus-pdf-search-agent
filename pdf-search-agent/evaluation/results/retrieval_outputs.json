@@ -1,0 +1,88 @@
+[
+  {
+    "question": "What is the main goal of the uploaded document?",
+    "expected_answer": null,
+    "expected_source": null,
+    "expected_page": null,
+    "retrieved_chunks": [
+      {
+        "text": "Copyleft and Copyright Copyleft • right to freely distribute and modify intellectual property • obligation that the same rights (license) apply to derivative work • weak copyleft: only applies to formerly-licensed parts (e.g., a library) • strong copyleft: applies to the complete software (deprecatory: viral effect) • license without copyleft is called permissive • implemented with copyright laws Examples for Copyleft Licenses • GNU General Public License (GPL) for software • Creative Commons share-alike license for documents and pictures Copyright (Urheberrecht) • kind of intellectual property, such as patents and trademarks (gestiges Eigentum, Patent, Marke) • owner of creative work has exclusive right over copies for a limited time • includes distribution, reproduction, public performance, derivative work • copyright is often granted by national laws Decision for copyleft is independent of: • decision to allow/forbid commercial use • decision about the fee to get the source code Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9b. Open-Source Principles 13",
+        "source": "09-opensource.pdf",
+        "page": 13,
+        "score": 0.6585760116577148
+      },
+      {
+        "text": "9. Open-Source Software 9a. Open-Source Software 9b. Open-Source Principles Rights and Duties Collective Ownership Recommendations for Companies Copyleft and Copyright The Impact of Licensing Issues Summary 9c. Open-Source Licenses Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9b. Open-Source Principles 9",
+        "source": "09-opensource.pdf",
+        "page": 9,
+        "score": 0.6841988563537598
+      },
+      {
+        "text": "MIT License [fossa.com] Profile • released: about 1987 • publisher: Massachusetts Institute of Technology • classification: permissive • most popular license • prominent use: Ruby on Rails (server-side web application framework), Node.js (JavaScript runtime environment) Selected Terms and Conditions • permits reuse within proprietary software • license shipped with distribution or relicensing (even to proprietary licenses) • “provided as-is, without warranty” The Full License Text “Copyright (c) <year><copyright holders> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ”Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED ”AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.” Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9c. Open-Source Licenses 17",
+        "source": "09-opensource.pdf",
+        "page": 17,
+        "score": 0.7037757635116577
+      },
+      {
+        "text": "Open-Source Software – Summary Lessons Learned • Open-source development and open-source software • Examples and central questions around open source • Free software foundation: four freedoms, RMS, FOSS • Next: What are main principles of open-source software? Further Reading • Sommerville, Chapter 7.4 Open-Source Development • Stallman’s 2014 TEDx Talk Practice 1. Form groups of 2–3 students 2. Which open-source software are you using? 3. Have you ever made use of the four freedoms? Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9a. Open-Source Software 8",
+        "source": "09-opensource.pdf",
+        "page": 8,
+        "score": 0.7069315314292908
+      },
+      {
+        "text": "Collective Ownership Sercan Leylek (2016) [wordpress.com] “Every programmer is an author.” Mosher’s Law of Software Engineering [twitter.com] “Don’t worry if it doesn’t work right. If everything did, you’d be out of a job.” Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9b. Open-Source Principles 11",
+        "source": "09-opensource.pdf",
+        "page": 11,
+        "score": 0.7207012176513672
+      }
+    ],
+    "metrics": {
+      "Recall@k": 0.0,
+      "MRR": 0.0,
+      "nDCG@k": 0.0
+    }
+  },
+  {
+    "question": "What does the document say about retrieval?",
+    "expected_answer": null,
+    "expected_source": null,
+    "expected_page": null,
+    "retrieved_chunks": [
+      {
+        "text": "Copyleft and Copyright Copyleft • right to freely distribute and modify intellectual property • obligation that the same rights (license) apply to derivative work • weak copyleft: only applies to formerly-licensed parts (e.g., a library) • strong copyleft: applies to the complete software (deprecatory: viral effect) • license without copyleft is called permissive • implemented with copyright laws Examples for Copyleft Licenses • GNU General Public License (GPL) for software • Creative Commons share-alike license for documents and pictures Copyright (Urheberrecht) • kind of intellectual property, such as patents and trademarks (gestiges Eigentum, Patent, Marke) • owner of creative work has exclusive right over copies for a limited time • includes distribution, reproduction, public performance, derivative work • copyright is often granted by national laws Decision for copyleft is independent of: • decision to allow/forbid commercial use • decision about the fee to get the source code Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9b. Open-Source Principles 13",
+        "source": "09-opensource.pdf",
+        "page": 13,
+        "score": 0.7371138334274292
+      },
+      {
+        "text": "MIT License [fossa.com] Profile • released: about 1987 • publisher: Massachusetts Institute of Technology • classification: permissive • most popular license • prominent use: Ruby on Rails (server-side web application framework), Node.js (JavaScript runtime environment) Selected Terms and Conditions • permits reuse within proprietary software • license shipped with distribution or relicensing (even to proprietary licenses) • “provided as-is, without warranty” The Full License Text “Copyright (c) <year><copyright holders> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ”Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED ”AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.” Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9c. Open-Source Licenses 17",
+        "source": "09-opensource.pdf",
+        "page": 17,
+        "score": 0.7799673080444336
+      },
+      {
+        "text": "9. Open-Source Software 9a. Open-Source Software 9b. Open-Source Principles Rights and Duties Collective Ownership Recommendations for Companies Copyleft and Copyright The Impact of Licensing Issues Summary 9c. Open-Source Licenses Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9b. Open-Source Principles 9",
+        "source": "09-opensource.pdf",
+        "page": 9,
+        "score": 0.7944173216819763
+      },
+      {
+        "text": "for i, f in enumerate(files, 1): console.print(f\"{i}: {f}\") choice = Prompt.ask(\"\\nChoose a session\", choices=[str(i) for i in range if choice == \"0\": return None, [] filename = files[int(choice) - 1] with open(filename, \"r\") as f: return filename, json.load(f) def select_model(): console.print(Panel(\"[bold blue]Model Selection[/bold blue]\", expand=Fals for i, m in enumerate(MODELS, 1): console.print(f\"[bold cyan]{i}[/bold cyan]: {m}\") choice = Prompt.ask(\"\\nSelect model\", choices=[str(i) for i in range(1, l return MODELS[int(choice) - 1] def main(): # 1. Session & Model Setup log_filename, history = select_session() if not log_filename: timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\") log_filename = f\"chat_log_{timestamp}.json\" history = [{\"role\": \"system\", \"content\": \"You are a helpful assistant selected_model = select_model() console.print(f\"\\n[bold yellow]Active Session:[/bold yellow] [green]{log_ try: while True: user_input = get_multiline_input() if not user_input: continue if user_input.lower() in [\"exit\", \"quit\"]: break history.append({\"role\": \"user\", \"content\": user_input}) # API Call with Usage Tracking completion = client.chat.completions.create( model=selected_model, messages=history, stream=True, stream_options={\"include_usage\": True}, # Crucial for token t extra_body={\"chat_template_kwargs\": {\"enable_thinking\": True ) full_content = \"\" is_thinking = False usage_data = None for chunk in completion: Are you too a Poor-GPU-guy? Here’s how to run 400B par... https://medium.com/artiﬁcial-intel-ligence-playground/are... 17 of 25 6/29/26, 16:32",
+        "source": "Are you too a Poor-GPU-guy_ Here’s how to run 400B parameter Models for free _ by Fabio Matricardi _ Artificial INTEL-ligence Playground _ Medium.pdf",
+        "page": 17,
+        "score": 0.8053781390190125
+      },
+      {
+        "text": "Open-Source Software – Summary Lessons Learned • Open-source development and open-source software • Examples and central questions around open source • Free software foundation: four freedoms, RMS, FOSS • Next: What are main principles of open-source software? Further Reading • Sommerville, Chapter 7.4 Open-Source Development • Stallman’s 2014 TEDx Talk Practice 1. Form groups of 2–3 students 2. Which open-source software are you using? 3. Have you ever made use of the four freedoms? Chico Sundermann, Raphael Dunkel SE2 – 9. Open-Source Software – 9a. Open-Source Software 8",
+        "source": "09-opensource.pdf",
+        "page": 8,
+        "score": 0.8133013248443604
+      }
+    ],
+    "metrics": {
+      "Recall@k": 0.0,
+      "MRR": 0.0,
+      "nDCG@k": 0.0
+    }
+  }
+]

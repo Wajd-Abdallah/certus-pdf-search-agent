@@ -1,21 +1,39 @@
+"""
+Runs retrieval-only evaluation: for each benchmark question, retrieves chunks
+and scores them against the expected source/page.
+
+Run from the project root as a module (not as a plain script), so that
+"from app...." imports resolve correctly:
+
+    python -m evaluation.run_retrieval_eval
+
+NOTE ON REPRODUCIBILITY: this currently reads from the same ChromaDB
+collection the live Streamlit app uses (configs/baseline.yaml ->
+index.persist_directory). Results depend on whatever is indexed there at
+run time. For fully reproducible evaluation, index a fixed, known test PDF
+into that collection before running this script (or point it at a
+dedicated evaluation-only collection).
+"""
+
 import json
 from pathlib import Path
 
 from evaluation.benchmark_loader import load_small_benchmark
 from evaluation.retrieval_metrics import evaluate_question
 
-try:
-    from app.indexer import Indexer
-    from app.retriever import Retriever
-except ModuleNotFoundError:
-    from indexer import Indexer
-    from retriever import Retriever
+from app.config import load_config
+from app.indexer import Indexer
+from app.retriever import Retriever
 
 
 def main():
-    benchmark = load_small_benchmark()
+    config = load_config()
 
-    indexer = Indexer()
+    benchmark = load_small_benchmark()
+    indexer = Indexer(
+        collection_name=config["index"]["collection_name"],
+        persist_directory=config["index"]["persist_directory"],
+    )
     retriever = Retriever(indexer)
 
     outputs = []
@@ -30,10 +48,10 @@ def main():
 
             clean_chunks = [
                 {
-                    "text": chunk.get("text", ""),
-                    "source": chunk.get("source", chunk.get("document_name", "")),
-                    "page": chunk.get("page", chunk.get("page_number", None)),
-                    "score": chunk.get("score", chunk.get("similarity", None)),
+                    "text": chunk.get("text_content", ""),
+                    "source": chunk.get("metadata", {}).get("document_name", ""),
+                    "page": chunk.get("metadata", {}).get("page_number", None),
+                    "score": chunk.get("distance", None),  # NOTE: lower = better match
                 }
                 for chunk in results
             ]
@@ -60,7 +78,6 @@ def main():
         except Exception as e:
             print("Retrieval could not run:")
             print(e)
-
             outputs.append({
                 "question": sample.question,
                 "expected_answer": sample.expected_answer,
@@ -86,11 +103,9 @@ def main():
 
     metric_names = ["Recall@k", "MRR", "nDCG@k"]
     summary = {}
-
     for metric_name in metric_names:
         values = [item["metrics"][metric_name] for item in outputs]
         summary[metric_name] = sum(values) / len(values) if values else 0.0
-
     summary["num_questions"] = len(outputs)
 
     with summary_file.open("w", encoding="utf-8") as f:

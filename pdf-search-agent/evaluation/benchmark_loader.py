@@ -1,23 +1,8 @@
-import json
-from dataclasses import dataclass
-from pathlib import Path
-from typing import List
-
-
-@dataclass
-class BenchmarkQuestion:
-    question: str
-    expected_answer: str | None = None
-    expected_source: str | None = None
-    expected_page: int | None = None
-
+BENCHMARK_FILE = Path(__file__).resolve().parent / "data" / "benchmark_subset.json"
 
 def load_small_benchmark() -> List[BenchmarkQuestion]:
-    benchmark_file = Path("evaluation/data/benchmark_subset.json")
-
-    with benchmark_file.open("r", encoding="utf-8") as f:
+    with BENCHMARK_FILE.open("r", encoding="utf-8") as f:
         data = json.load(f)
-
     return [
         BenchmarkQuestion(
             question=item["question"],

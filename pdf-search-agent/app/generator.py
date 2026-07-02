@@ -1,15 +1,25 @@
+"""
+Generates a grounded answer from retrieved chunks using a local Ollama model.
+Depends on app/retriever.py's output shape:
+    {"chunk_id", "text_content", "metadata": {..., "document_name", "page_number"}, "distance"}
+"""
+
+import logging
+
 import ollama
 
 from app.citation_formatter import formatCitations, extractContexts
 from app.abstention import ABSTAIN_MESSAGE, isAbstained, buildAbstentionOutput
 from app.schemas import Prediction
 
+logger = logging.getLogger(__name__)
 
-def generateAnswer(question: str, chunks: list) -> dict:
+
+def generate_answer(question: str, chunks: list[dict]) -> dict:
     if not chunks:
         return buildAbstentionOutput(question)
 
-    context = buildContext(chunks)
+    context = build_context(chunks)
 
     prompt = f"""You are a reliable PDF Search Agent. Your task is to answer questions based only on the provided document context.
 
@@ -37,10 +47,11 @@ Answer:"""
                     "content": prompt,
                 }
             ],
+            options={"temperature": 0},  # deterministic output for reproducibility
         )
         answer = response["message"]["content"].strip()
-
     except Exception:
+        logger.exception("Generation failed for question: '%s'", question)
         return buildAbstentionOutput(question, reason="generation_error")
 
     abstained = isAbstained(answer)
@@ -59,17 +70,21 @@ Answer:"""
     return prediction.toDict()
 
 
-def buildContext(chunks: list) -> str:
-    contextParts = []
-
+def build_context(chunks: list[dict]) -> str:
+    context_parts = []
     for index, chunk in enumerate(chunks):
-        source = chunk.get("source") or chunk.get("document") or "Unknown"
-        page = chunk.get("page") or chunk.get("page_number") or "?"
-        chunk_id = chunk.get("chunk_id") or chunk.get("id") or f"chunk_{index}"
-        text = chunk.get("text") or chunk.get("content") or ""
+        metadata = chunk.get("metadata", {})
+        source = metadata.get("document_name") or "Unknown"
+        page = metadata.get("page_number", "?")
+        chunk_id = chunk.get("chunk_id") or f"chunk_{index}"
+        text = chunk.get("text_content") or ""
 
-        contextParts.append(
+        context_parts.append(
             f"[Document: {source}, Page: {page}, Chunk ID: {chunk_id}]\n{text}"
         )
+    return "\n\n".join(context_parts)
 
-    return "\n\n".join(contextParts)
+
+# Backward-compatible aliases in case other files still import the old camelCase names.
+generateAnswer = generate_answer
+buildContext = build_context
