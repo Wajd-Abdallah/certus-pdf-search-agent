@@ -78,26 +78,31 @@ def ndcg_at_k(
 ) -> float:
     """
     Normalized Discounted Cumulative Gain (nDCG@k)
-
-    Assumes binary relevance:
-        relevant = 1
-        not relevant = 0
+    Assumes binary relevance: relevant = 1, not relevant = 0
     """
-
     if expected_source is None and expected_page is None:
         return 0.0
 
-    dcg = 0.0
+    relevances = [
+        1 if _is_relevant(chunk, expected_source, expected_page) else 0
+        for chunk in retrieved_chunks[:k]
+    ]
 
-    for rank, chunk in enumerate(retrieved_chunks[:k], start=1):
-        if _is_relevant(chunk, expected_source, expected_page):
-            dcg += 1.0 / log2(rank + 1)
+    dcg = sum(
+        rel / log2(rank + 1)
+        for rank, rel in enumerate(relevances, start=1)
+    )
 
-    # Only one relevant chunk is expected.
-    idcg = 1.0
+    # Ideal ranking: all relevant chunks pushed to the front.
+    ideal_relevances = sorted(relevances, reverse=True)
+    idcg = sum(
+        rel / log2(rank + 1)
+        for rank, rel in enumerate(ideal_relevances, start=1)
+    )
 
+    if idcg == 0:
+        return 0.0
     return dcg / idcg
-
 
 def evaluate_question(
     retrieved_chunks: List[Dict[str, Any]],
