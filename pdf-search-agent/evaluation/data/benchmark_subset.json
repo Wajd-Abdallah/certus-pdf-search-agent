@@ -1,13 +1,13 @@
 [
   {
     "question": "What is the main goal of the uploaded document?",
-    "expected_answer": null,
-    "expected_source": null,
-    "expected_page": null
+    "expected_answer": "The main goal of the uploaded document is to explain how users with limited lokal GPU resources can use NVIDIA NIM's free API endpoints to access large language models, such as Llama, Mistral, DeepSeek, and Nemotron, and build a CLI chat application with them" ,
+    "expected_source":"Are you too a Poor-GPU-guy_ Here’s how to run 400B parameter Models for free _ by Fabio Matricardi _ Artificial INTEL-ligence Playground _ Medium.pdf",
+    "expected_page": 1
   },
   {
     "question": "What does the document say about retrieval?",
-    "expected_answer": null,
+    "expected_answer": "I could not find enough evidence in the uploaded PDF to answer this question. Please try another question or upload a more relevant document",
     "expected_source": null,
     "expected_page": null
   }
