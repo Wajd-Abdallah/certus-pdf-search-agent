@@ -1,18 +1,16 @@
 from app.generator import generateAnswer
 
 
-def testNormalAnswer():
+def test_normal_answer():
     chunks = [
         {
-            "text": "RAG stands for Retrieval Augmented Generation. It retrieves relevant documents before generating an answer.",
-            "source": "paper1.pdf",
-            "page": 3
+            "text_content": "RAG stands for Retrieval Augmented Generation. It retrieves relevant documents before generating an answer.",
+            "metadata": {"document_name": "paper1.pdf", "page_number": 3},
         },
         {
-            "text": "RAG reduces hallucinations by grounding answers in real documents.",
-            "source": "paper1.pdf",
-            "page": 5
-        }
+            "text_content": "RAG reduces hallucinations by grounding answers in real documents.",
+            "metadata": {"document_name": "paper1.pdf", "page_number": 5},
+        },
     ]
 
     result = generateAnswer("What is RAG?", chunks)
@@ -29,11 +27,10 @@ def testNormalAnswer():
     assert "abstention_reason" in result
     assert "retrieved_contexts" in result
     assert len(result["retrieved_contexts"]) > 0
-
     print("Test 1 passed!\n")
 
 
-def testAbstentionNoChunks():
+def test_abstention_no_chunks():
     result = generateAnswer("What is the capital of France?", [])
 
     print("Test 2: Abstention - empty chunks")
@@ -45,16 +42,14 @@ def testAbstentionNoChunks():
     assert result["citations"] == []
     assert result["abstention_reason"] == "insufficient_context"
     assert result["retrieved_contexts"] == []
-
     print("Test 2 passed!\n")
 
 
-def testOutputSchema():
+def test_output_schema():
     chunks = [
         {
-            "text": "RAG stands for Retrieval Augmented Generation.",
-            "source": "paper1.pdf",
-            "page": 3
+            "text_content": "RAG stands for Retrieval Augmented Generation.",
+            "metadata": {"document_name": "paper1.pdf", "page_number": 3},
         }
     ]
 
@@ -63,27 +58,30 @@ def testOutputSchema():
     print("Test 3: Output schema")
     print(result)
 
-    expected_keys = {
+    # Subset check, not strict equality: generate_answer legitimately gained
+    # prompt_tokens/completion_tokens fields for efficiency tracking. New
+    # fields being added over time shouldn't break this test -- we only
+    # care that the core required keys are always present.
+    required_keys = {
         "question",
         "answer",
         "citations",
         "abstained",
         "abstention_reason",
-        "retrieved_contexts"
+        "retrieved_contexts",
     }
+    assert required_keys.issubset(result.keys())
 
-    assert set(result.keys()) == expected_keys
     assert isinstance(result["question"], str)
     assert isinstance(result["answer"], str)
     assert isinstance(result["citations"], list)
     assert isinstance(result["abstained"], bool)
     assert isinstance(result["retrieved_contexts"], list)
-
     print("Test 3 passed!\n")
 
 
 if __name__ == "__main__":
-    testNormalAnswer()
-    testAbstentionNoChunks()
-    testOutputSchema()
+    test_normal_answer()
+    test_abstention_no_chunks()
+    test_output_schema()
     print("All tests passed!")

@@ -10,6 +10,8 @@ class Prediction:
     abstained: bool
     abstention_reason: Optional[str]
     retrieved_contexts: list
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
 
     def toDict(self) -> dict:
         return asdict(self)
