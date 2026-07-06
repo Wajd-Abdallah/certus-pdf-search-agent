@@ -1,3 +1,4 @@
+import evaluation._env
 from pathlib import Path
 from app.pipeline import process_pdf
 

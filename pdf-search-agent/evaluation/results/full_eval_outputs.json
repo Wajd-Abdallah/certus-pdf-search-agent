@@ -1,0 +1,386 @@
+[
+  {
+    "question": "What are the challenges in estimating output impedance in inverter-based grids?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "The challenges in estimating output impedance in inverter-based grids include:\n\n(i) Inverters typically lack access to global measurements or network-wide data.\n(ii) Measured signals often lack the necessary persistence of excitation.\n(iii) Only local output voltage and current are measurable, while both line impedance and grid voltage influence these measurements.\n(iv) Altering the power system to assist in impedance estimation is either impractical or not allowed.",
+    "citations": [
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 2,
+        "chunk_id": "4050efb1-2a24-4004-828e-c38ca0470e51"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 1,
+        "chunk_id": "eda1228b-ae24-4864-a14e-a0dcee61f1aa"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 8,
+        "chunk_id": "248dd3d0-24d1-4f6a-9433-d3e3fb72d025"
+      }
+    ],
+    "latency_seconds": 24.973,
+    "prompt_tokens": 3292,
+    "completion_tokens": 87,
+    "total_tokens": 3379,
+    "lexical_grounding_score": 0.977,
+    "exact_match": 0.0,
+    "f1": 0.286,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "How does discarding q-axis dynamics affect noise reduction in power networks?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "Discarding q-axis dynamics allows for effective rejection of noise caused by inverter setpoint changes and measurement noise. This is because Vqg experiences larger fluctuation, leading to larger BPF(Vqg) compared to Vdg and BPF(Vdg). By discarding the q-axis dynamics, only the d-axis dynamics are used, which results in a lower RMSPE value (2.1261% for resistance and 0.78482% for inductance) due to reduced noise.",
+    "citations": [
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 3,
+        "chunk_id": "8bf852b7-3c57-4586-a5ae-7b03d5875c6b"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 4,
+        "chunk_id": "271bcadb-1a6e-443f-84f4-f245789e5e59"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 2,
+        "chunk_id": "f09ea7ff-e24a-448c-af2b-31ba5eb3d906"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 7,
+        "chunk_id": "3daa2909-1175-4bce-a2ff-b75dd1957c54"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 8,
+        "chunk_id": "248dd3d0-24d1-4f6a-9433-d3e3fb72d025"
+      }
+    ],
+    "latency_seconds": 28.977,
+    "prompt_tokens": 4096,
+    "completion_tokens": 102,
+    "total_tokens": 4198,
+    "lexical_grounding_score": 0.882,
+    "exact_match": 0.0,
+    "f1": 0.41,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "How does the MLMM approach affect the analysis of Root Mean Squared Error (RMSE)?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "The MLMM approach allows for the direct analysis of Root Mean Squared Error (RMSE) by extending Equation 6 to include a square root link function, as shown in Equation 16. This enables the modeling of squared error directly in an MLMM approach, providing a more interpretable method to demonstrate findings related to RMSE and its relationship with covariate adjustment.",
+    "citations": [
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 28,
+        "chunk_id": "c630583e-33f0-41f3-b414-d5cbeeea1be7"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 11,
+        "chunk_id": "7bf55d42-5e86-4b71-a1dd-57f9ed78f0a3"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 33,
+        "chunk_id": "f1c2ba09-bd72-462b-81e9-3b2e38489dc9"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 29,
+        "chunk_id": "edb98df4-d17c-43ca-9e7e-8463dc16058b"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 30,
+        "chunk_id": "8b57eef8-dadb-4517-aa30-9872ed3cefed"
+      }
+    ],
+    "latency_seconds": 114.872,
+    "prompt_tokens": 2313,
+    "completion_tokens": 75,
+    "total_tokens": 2388,
+    "lexical_grounding_score": 0.871,
+    "exact_match": 0.0,
+    "f1": 0.349,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "How can performance metrics typically defined at an aggregate level be evaluated within a multilevel framework?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "According to the document, performance metrics typically defined at an aggregate level can be evaluated within a multilevel framework by using the inverse of the squared Monte Carlo SEs as weights. This approach is mentioned on page 14 of the uploaded documents.",
+    "citations": [
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 14,
+        "chunk_id": "e65e04a0-ea9f-45aa-8c49-b14bbc209e48"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 30,
+        "chunk_id": "8b57eef8-dadb-4517-aa30-9872ed3cefed"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 5,
+        "chunk_id": "f6991944-e9b1-49ae-8a32-00896503222e"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 34,
+        "chunk_id": "9f4eaa23-2f12-40e3-b3a7-8fe0a7b92ede"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 13,
+        "chunk_id": "dcfdb715-5143-40fe-9909-1ea304d1c6fb"
+      }
+    ],
+    "latency_seconds": 31.035,
+    "prompt_tokens": 2568,
+    "completion_tokens": 50,
+    "total_tokens": 2618,
+    "lexical_grounding_score": 0.76,
+    "exact_match": 0.0,
+    "f1": 0.356,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "What is the concept of location-class independence in object detection?",
+    "should_abstain": false,
+    "did_abstain": true,
+    "abstention_outcome": "false_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": [],
+    "latency_seconds": 141.344,
+    "prompt_tokens": 3784,
+    "completion_tokens": 16,
+    "total_tokens": 3800
+  },
+  {
+    "question": "Why is post-calibrated softmax adjustment (PCSA) important in handling class imbalances?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "PCSA is important because it boasts strong performance, good compatibility with many methods, and does not necessitate specialized loss function optimization, making it more user-friendly. However, current PCSA methods utilize solely the train set's class frequency ps(y) as shown in Fig.1-top, overlooking the significance of the classes' dependence on the location distribution ps(y, u).",
+    "citations": [
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 1,
+        "chunk_id": "7a1450e3-e353-488c-bc6f-e29be5b1397a"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 6,
+        "chunk_id": "e587988f-1568-449d-8865-af149f9e7b1c"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 3,
+        "chunk_id": "0eb0f222-01b5-43a6-9531-554ed7961dae"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 12,
+        "chunk_id": "0a0c202c-cd3c-4806-a1be-22413de429b0"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 10,
+        "chunk_id": "0d39074b-a8e3-4533-bd95-d098920c669a"
+      }
+    ],
+    "latency_seconds": 14.589,
+    "prompt_tokens": 1916,
+    "completion_tokens": 75,
+    "total_tokens": 1991,
+    "lexical_grounding_score": 0.895,
+    "exact_match": 0.0,
+    "f1": 0.282,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "How does incorporating demographic factors influence job transition predictions using LLMs?",
+    "should_abstain": false,
+    "did_abstain": true,
+    "abstention_outcome": "false_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": [],
+    "latency_seconds": 2346.107,
+    "prompt_tokens": 2717,
+    "completion_tokens": 16,
+    "total_tokens": 2733
+  },
+  {
+    "question": "What is tokenization in the context of large language models (LLMs)?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "Tokenization in the context of large language models (LLMs) is defined as \"the function mapping a sequence of words to a sequence of tokens.\"",
+    "citations": [
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 12,
+        "chunk_id": "54334ac8-7c0c-4dee-b4fb-f7245f68ab83"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 45,
+        "chunk_id": "0f90df2b-d0ad-4fb6-bdef-16e867214c40"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 9,
+        "chunk_id": "d0e262e7-9960-4879-b2f2-913ec6dbb755"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 41,
+        "chunk_id": "5d2a2043-f534-4b13-bcd4-05612ceba28f"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 11,
+        "chunk_id": "16e54684-ee8e-4cda-864d-defbd0dd6477"
+      }
+    ],
+    "latency_seconds": 256.267,
+    "prompt_tokens": 3070,
+    "completion_tokens": 31,
+    "total_tokens": 3101,
+    "lexical_grounding_score": 0.833,
+    "exact_match": 0.0,
+    "f1": 0.387,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "How do traditional feature selection methods for classification work?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "Traditional feature selection methods for classification typically operate independently of learning algorithms. They can be categorized into three main approaches:\n\n1. Filter methods: These operate independently of learning algorithms and rank features based on their relevance to the target class while minimizing redundancy among features.\n2. Wrapper methods: These depend on learning algorithms to iteratively improve the quality of selected features.\n3. Embedded methods: These integrate feature selection into supervised/unsupervised learning algorithms.\n\nThese traditional methods often face scalability issues as the number of data points or classes increases, leading to computational inefficiencies and potential loss of accuracy.",
+    "citations": [
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 1,
+        "chunk_id": "f60ec84b-d037-44a0-aee5-bb05cdccf13b"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 3,
+        "chunk_id": "d8e7a4a4-d295-499e-baf4-7721e57d98bd"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 9,
+        "chunk_id": "9488e671-d7ff-44f2-9355-bf5adb5ad1bd"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 2,
+        "chunk_id": "87b10c1f-ce5c-4b58-b62e-bce6b156d569"
+      }
+    ],
+    "latency_seconds": 346.523,
+    "prompt_tokens": 3934,
+    "completion_tokens": 117,
+    "total_tokens": 4051,
+    "lexical_grounding_score": 0.923,
+    "exact_match": 0.0,
+    "f1": 0.213,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "What challenges are associated with high-dimensional data in feature selection?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_outcome": "true_negative",
+    "answer": "High-dimensional data is associated with challenges such as increased storage requirements and reduced interpretability. The text mentions that our approach leverages generative models to compute the SNR and rank features, which reduces storage requirements and enhances interpretability.",
+    "citations": [
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 1,
+        "chunk_id": "f60ec84b-d037-44a0-aee5-bb05cdccf13b"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 9,
+        "chunk_id": "9488e671-d7ff-44f2-9355-bf5adb5ad1bd"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 3,
+        "chunk_id": "d8e7a4a4-d295-499e-baf4-7721e57d98bd"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 2,
+        "chunk_id": "45f73cf2-6643-40ba-b2e7-b4a7ea5555e9"
+      }
+    ],
+    "latency_seconds": 444.112,
+    "prompt_tokens": 4096,
+    "completion_tokens": 47,
+    "total_tokens": 4143,
+    "lexical_grounding_score": 0.92,
+    "exact_match": 0.0,
+    "f1": 0.282,
+    "citation_correct": true,
+    "llm_judge_score": 4
+  },
+  {
+    "question": "Is utility related to similarity between distributions in expected free energy?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": [],
+    "latency_seconds": 918.839,
+    "prompt_tokens": 3267,
+    "completion_tokens": 16,
+    "total_tokens": 3283
+  },
+  {
+    "question": "Do the beam patterns exhibit circular symmetry within their $50\\%$ contour?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": [],
+    "latency_seconds": 23.414,
+    "prompt_tokens": 4096,
+    "completion_tokens": 16,
+    "total_tokens": 4112
+  },
+  {
+    "question": "What is the role of a normalizing flow in NPE?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": [],
+    "latency_seconds": 947.032,
+    "prompt_tokens": 4096,
+    "completion_tokens": 16,
+    "total_tokens": 4112
+  }
+]

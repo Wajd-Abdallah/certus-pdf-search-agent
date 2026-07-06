@@ -47,9 +47,19 @@ Answer:"""
                     "content": prompt,
                 }
             ],
-            options={"temperature": 0},  # deterministic output for reproducibility
+            options={"temperature": 0},
         )
         answer = response["message"]["content"].strip()
+
+        # Token counts are a nice-to-have for efficiency reporting; never let
+        # a missing/renamed field break generation itself.
+        try:
+            prompt_tokens = response.get("prompt_eval_count")
+            completion_tokens = response.get("eval_count")
+        except Exception:
+            prompt_tokens = None
+            completion_tokens = None
+
     except Exception:
         logger.exception("Generation failed for question: '%s'", question)
         return buildAbstentionOutput(question, reason="generation_error")
@@ -65,6 +75,8 @@ Answer:"""
         abstained=abstained,
         abstention_reason="insufficient_context" if abstained else None,
         retrieved_contexts=retrieved_contexts,
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
     )
 
     return prediction.toDict()
@@ -85,6 +97,5 @@ def build_context(chunks: list[dict]) -> str:
     return "\n\n".join(context_parts)
 
 
-# Backward-compatible aliases in case other files still import the old camelCase names.
 generateAnswer = generate_answer
 buildContext = build_context

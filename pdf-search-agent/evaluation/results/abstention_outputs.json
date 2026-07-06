@@ -1,0 +1,307 @@
+[
+  {
+    "question": "What are the challenges in estimating output impedance in inverter-based grids?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "The challenges in estimating output impedance in inverter-based grids include:\n\n(i) Inverters typically lack access to global measurements or network-wide data.\n(ii) Measured signals often lack the necessary persistence of excitation.\n(iii) Only local output voltage and current are measurable, while both line impedance and grid voltage influence these measurements.\n(iv) Altering the power system to assist in impedance estimation is either impractical or not allowed.",
+    "citations": [
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 2,
+        "chunk_id": "fbf1ce21-86b2-4c51-b29a-78adfda9b564"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 1,
+        "chunk_id": "082344f9-9ec9-4f6b-aaf3-848313a7f701"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 8,
+        "chunk_id": "eb642a88-6139-4a59-85da-b3f2c836a41b"
+      }
+    ]
+  },
+  {
+    "question": "How does discarding q-axis dynamics affect noise reduction in power networks?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "Discarding q-axis dynamics allows for effective rejection of noise caused by inverter setpoint changes and measurement noise. This is because Vqg experiences larger fluctuation, leading to larger BPF(Vqg) compared to Vdg and BPF(Vdg), which can be mitigated when using only d-axis dynamics.",
+    "citations": [
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 3,
+        "chunk_id": "b1e4fdcb-8944-4df5-8983-19783f354058"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 4,
+        "chunk_id": "165715d7-9801-4052-98da-f3a14e9d832f"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 2,
+        "chunk_id": "6181471d-1eb9-4e41-9670-f210262b2758"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 7,
+        "chunk_id": "3e8eb73e-c3aa-439d-87fa-e647675f2e84"
+      },
+      {
+        "document": "2410.14077v2.pdf",
+        "page_number": 8,
+        "chunk_id": "eb642a88-6139-4a59-85da-b3f2c836a41b"
+      }
+    ]
+  },
+  {
+    "question": "How does the MLMM approach affect the analysis of Root Mean Squared Error (RMSE)?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "The MLMM approach allows for the direct analysis of Root Mean Squared Error (RMSE) by extending Equation 6 to include a square root link function, as shown in Equation 16. This enables the modeling of squared error directly in an MLMM approach, providing a more interpretable method to demonstrate findings related to RMSE and its relationship with covariate adjustment.",
+    "citations": [
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 28,
+        "chunk_id": "f74cc113-6d34-464b-8baa-62525a154a5e"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 11,
+        "chunk_id": "f4bd52ce-e522-407a-8be8-8373fd77080f"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 33,
+        "chunk_id": "ee3fea3d-1461-4f7a-ad6c-5e7e01a89c50"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 29,
+        "chunk_id": "91ab42fd-10ad-4c6b-a09e-3221e6ca07a6"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 30,
+        "chunk_id": "08436117-88a3-4cbf-9a54-c322ec945b04"
+      }
+    ]
+  },
+  {
+    "question": "How can performance metrics typically defined at an aggregate level be evaluated within a multilevel framework?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "According to the document, performance metrics typically defined at an aggregate level can be evaluated within a multilevel framework using a two-level random intercepts MLMM (Equation 2) or, as demonstrated in Section 3.3, even metrics that are typically defined at the aggregate level such as true standard error and RMSE can be evaluated in the three-level MLMM framework to gain the added benefits of the three-level approach.",
+    "citations": [
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 14,
+        "chunk_id": "bb99beb2-7f9b-4636-b9f8-e73f4c3952b1"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 30,
+        "chunk_id": "08436117-88a3-4cbf-9a54-c322ec945b04"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 5,
+        "chunk_id": "06843a13-c512-4503-aba7-c72ed1fb2d9b"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 34,
+        "chunk_id": "7e6e3b98-38ce-4edc-85fa-cc5ed4b610a7"
+      },
+      {
+        "document": "2401.07294v4.pdf",
+        "page_number": 13,
+        "chunk_id": "3cfd0da6-2223-4284-8d7f-3859f28265fa"
+      }
+    ]
+  },
+  {
+    "question": "What is the concept of location-class independence in object detection?",
+    "should_abstain": false,
+    "did_abstain": true,
+    "abstention_reason": "insufficient_context",
+    "outcome": "false_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": []
+  },
+  {
+    "question": "Why is post-calibrated softmax adjustment (PCSA) important in handling class imbalances?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "PCSA is important because it boasts strong performance, good compatibility with many methods, and does not necessitate specialized loss function optimization, making it more user-friendly. However, current PCSA methods utilize solely the train set's class frequency ps(y) as shown in Fig.1-top, overlooking the significance of the classes' dependence on the location distribution ps(y, u).",
+    "citations": [
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 1,
+        "chunk_id": "13e378c2-8468-44e1-9670-0ec149247f26"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 6,
+        "chunk_id": "374484b4-aedf-4967-935b-a3fbe4292cad"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 3,
+        "chunk_id": "31796800-81df-4c6c-8fea-f4239200988e"
+      },
+      {
+        "document": "2410.11774v2.pdf",
+        "page_number": 12,
+        "chunk_id": "4232d4b7-d9f0-4cc6-bb07-332bf61cfdea"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 10,
+        "chunk_id": "0786ec93-5816-43bf-a474-628822a4a3b1"
+      }
+    ]
+  },
+  {
+    "question": "How does incorporating demographic factors influence job transition predictions using LLMs?",
+    "should_abstain": false,
+    "did_abstain": true,
+    "abstention_reason": "insufficient_context",
+    "outcome": "false_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": []
+  },
+  {
+    "question": "What is tokenization in the context of large language models (LLMs)?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "Tokenization in the context of large language models (LLMs) is defined as \"the function mapping a sequence of words to a sequence of tokens.\"",
+    "citations": [
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 12,
+        "chunk_id": "79cb4fd1-4d0a-4e33-a676-1ee0f8d4e9e7"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 45,
+        "chunk_id": "2f69727d-5db2-4e18-a0e3-f74895044af0"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 9,
+        "chunk_id": "94942903-2367-45d8-82c8-9ec46e9d56fc"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 41,
+        "chunk_id": "62c71282-8182-4b03-8edb-2c7ddb810dd0"
+      },
+      {
+        "document": "2406.17972v3.pdf",
+        "page_number": 11,
+        "chunk_id": "ab665bbf-905f-4144-b872-5be34961ce2f"
+      }
+    ]
+  },
+  {
+    "question": "How do traditional feature selection methods for classification work?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "Traditional feature selection methods for classification typically operate independently of learning algorithms. They can be categorized into three main approaches:\n\n1. Filter methods: These operate independently of learning algorithms and rank features based on their relevance to the target class while minimizing redundancy among features.\n2. Wrapper methods: These depend on learning algorithms to iteratively improve the quality of selected features.\n3. Embedded methods: These integrate feature selection into supervised/unsupervised learning algorithms.\n\nThese traditional methods often face scalability issues as the number of data points or classes increases, leading to computational inefficiencies and potential loss of accuracy.",
+    "citations": [
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 1,
+        "chunk_id": "7b8e4732-0635-4e4a-adaa-6309b1f029d5"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 3,
+        "chunk_id": "e99f0dc8-1543-472e-91c6-1daa8a68c2e6"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 9,
+        "chunk_id": "5db418b8-c3d0-46b0-9110-80f6315aa02e"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 2,
+        "chunk_id": "9e445278-591b-4ae1-94bb-a4b93f508367"
+      }
+    ]
+  },
+  {
+    "question": "What challenges are associated with high-dimensional data in feature selection?",
+    "should_abstain": false,
+    "did_abstain": false,
+    "abstention_reason": null,
+    "outcome": "true_negative",
+    "answer": "High-dimensional data is associated with challenges such as increased storage requirements and reduced interpretability. The text mentions that our approach leverages generative models to compute the SNR and rank features, which reduces storage requirements and enhances interpretability.",
+    "citations": [
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 1,
+        "chunk_id": "7b8e4732-0635-4e4a-adaa-6309b1f029d5"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 9,
+        "chunk_id": "5db418b8-c3d0-46b0-9110-80f6315aa02e"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 3,
+        "chunk_id": "e99f0dc8-1543-472e-91c6-1daa8a68c2e6"
+      },
+      {
+        "document": "2412.10128v2.pdf",
+        "page_number": 2,
+        "chunk_id": "834a5ffb-79bb-4539-87ec-f467cea4c169"
+      }
+    ]
+  },
+  {
+    "question": "Is utility related to similarity between distributions in expected free energy?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_reason": "insufficient_context",
+    "outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": []
+  },
+  {
+    "question": "Do the beam patterns exhibit circular symmetry within their $50\\%$ contour?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_reason": "insufficient_context",
+    "outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": []
+  },
+  {
+    "question": "What is the role of a normalizing flow in NPE?",
+    "should_abstain": true,
+    "did_abstain": true,
+    "abstention_reason": "insufficient_context",
+    "outcome": "true_positive",
+    "answer": "I could not find enough evidence in the uploaded documents to answer this question.",
+    "citations": []
+  }
+]

@@ -15,7 +15,9 @@ into that collection before running this script (or point it at a
 dedicated evaluation-only collection).
 """
 
+import evaluation._env
 import json
+import os
 from pathlib import Path
 
 from evaluation.benchmark_loader import load_small_benchmark
@@ -28,11 +30,12 @@ from app.retriever import Retriever
 
 def main():
     config = load_config()
+    persist_directory = os.environ.get("PDF_AGENT_CHROMA_DIR") or config["index"]["persist_directory"]
 
     benchmark = load_small_benchmark()
     indexer = Indexer(
         collection_name=config["index"]["collection_name"],
-        persist_directory=config["index"]["persist_directory"],
+        persist_directory=persist_directory,
     )
     retriever = Retriever(indexer)
 
