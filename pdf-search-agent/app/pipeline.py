@@ -10,6 +10,7 @@ so the app still runs.
 
 from __future__ import annotations
 import logging
+import os
 
 from app.chunker import parse_and_chunk, RecursiveChunker
 from app.config import load_config
@@ -23,12 +24,14 @@ logger = logging.getLogger(__name__)
 config = load_config()
 logger.info("Loaded config: run='%s'", config["run"]["name"])
 
-# Global shared instances for the baseline (single-user, single-session assumption).
-# NOTE: revisit this if we later need per-session isolation (e.g. multiple users,
-# or tests that expect a clean index each run).
+# If PDF_AGENT_CHROMA_DIR is set (e.g. by evaluation scripts), use it instead
+# of the configured live-app directory -- keeps evaluation runs isolated
+# from whatever is currently uploaded in the running Streamlit app.
+persist_directory = os.environ.get("PDF_AGENT_CHROMA_DIR") or config["index"]["persist_directory"]
+
 indexer = Indexer(
     collection_name=config["index"]["collection_name"],
-    persist_directory=config["index"]["persist_directory"],
+    persist_directory=persist_directory,
 )
 retriever = Retriever(indexer=indexer)
 
@@ -75,18 +78,11 @@ def process_pdf(file_path: str) -> dict:
 
 
 def answer_question(question: str, top_k: int | None = None) -> dict:
-    """
-    Full QA pipeline: retrieve -> generate.
-
-    Note: retriever.retrieve() already returns chunks in the shape that
-    generate_answer() expects ({"text_content", "metadata": {...}, "distance"}),
-    so no conversion step is needed here.
-    """
     if top_k is None:
         top_k = config["retrieval"]["top_k"]
 
     try:
-        raw_chunks = retriever.retrieve(question, top_k=top_k)
+        raw_chunks = retriever.retrieve(question, top_k=top_k, max_distance=0.85)
         result = generate_answer(question, raw_chunks)
         return result
 
@@ -100,8 +96,7 @@ def answer_question(question: str, top_k: int | None = None) -> dict:
             "abstention_reason": "generation_error",
             "retrieved_contexts": [],
         }
-
-
+        
 # Backward-compatible aliases in case other files still import the old camelCase names.
 processPdf = process_pdf
 answerQuestion = answer_question
