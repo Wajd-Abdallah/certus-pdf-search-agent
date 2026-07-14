@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from app.pipeline import processPdf, answerQuestion, indexer
 
 # Make sure the project root (parent of ui/) is on the import path,
 # so "from app...." imports work no matter how/where streamlit is launched from.
@@ -379,11 +380,6 @@ def format_backend_answer(result: dict) -> dict:
         "error": None,
     }
 
-def reset_app():
-    st.session_state.uploaded_docs = {}
-    st.session_state.uploaded_file_paths = {}
-    st.session_state.chat_history = [...]
-    st.session_state.eval_runs = []
 
 def process_pdf(uploaded_file):
     file_name = uploaded_file.name
@@ -427,6 +423,8 @@ def process_pdf(uploaded_file):
 
 
 def reset_app():
+    indexer.clear()  # actually wipes the vector database, not just the UI state
+
     st.session_state.uploaded_docs = {}
     st.session_state.uploaded_file_paths = {}
     st.session_state.chat_history = [
