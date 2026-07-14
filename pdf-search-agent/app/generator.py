@@ -1,5 +1,9 @@
 """
 Generates a grounded answer from retrieved chunks using a local Ollama model.
+Citations are now extracted from the model's own inline citation markers
+in the generated answer text (e.g. "[document.pdf:p3]"), rather than
+attached for every retrieved chunk regardless of use.
+
 Depends on app/retriever.py's output shape:
     {"chunk_id", "text_content", "metadata": {..., "document_name", "page_number"}, "distance"}
 """
@@ -8,7 +12,7 @@ import logging
 
 import ollama
 
-from app.citation_formatter import formatCitations, extractContexts
+from app.citation_formatter import format_citations, extractContexts
 from app.abstention import ABSTAIN_MESSAGE, isAbstained, buildAbstentionOutput
 from app.schemas import Prediction
 
@@ -32,6 +36,8 @@ Instructions:
 - Answer only using the information from the context above.
 - Do not use external knowledge.
 - Do not make up information.
+- After EVERY factual claim you make, add an inline citation showing exactly which document and page it came from, in this format: [document_name:pPAGE]. For example: [handbook.pdf:p3].
+- Only cite a document and page that actually appears in the context above.
 - If the context does not contain enough information, respond exactly with:
 "{ABSTAIN_MESSAGE}"
 - Keep the answer concise and clear.
@@ -51,8 +57,6 @@ Answer:"""
         )
         answer = response["message"]["content"].strip()
 
-        # Token counts are a nice-to-have for efficiency reporting; never let
-        # a missing/renamed field break generation itself.
         try:
             prompt_tokens = response.get("prompt_eval_count")
             completion_tokens = response.get("eval_count")
@@ -66,7 +70,12 @@ Answer:"""
 
     abstained = isAbstained(answer)
     retrieved_contexts = extractContexts(chunks)
-    citations = formatCitations(chunks) if not abstained else []
+
+    # Citations are extracted from the model's own answer text, so they
+    # only include documents/pages it actually claimed to use -- not
+    # every chunk that was retrieved. No citations are built if the
+    # model abstained, since an abstention has no grounded claims.
+    citations = format_citations(answer, chunks) if not abstained else []
 
     prediction = Prediction(
         question=question,
