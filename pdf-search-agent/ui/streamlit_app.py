@@ -379,6 +379,11 @@ def format_backend_answer(result: dict) -> dict:
         "error": None,
     }
 
+def reset_app():
+    st.session_state.uploaded_docs = {}
+    st.session_state.uploaded_file_paths = {}
+    st.session_state.chat_history = [...]
+    st.session_state.eval_runs = []
 
 def process_pdf(uploaded_file):
     file_name = uploaded_file.name
