@@ -1,24 +1,61 @@
 {
-  "num_questions": 13,
-  "abstention_accuracy": 0.8461538461538461,
-  "true_positive": 3,
-  "true_negative": 8,
-  "false_negative": 0,
-  "false_positive": 2,
-  "system_error": 0,
-  "avg_exact_match": 0.0,
-  "avg_f1": 0.320538422997923,
-  "avg_llm_judge_score": 4.0,
-  "avg_lexical_grounding_score": 0.8827175636125252,
-  "citation_accuracy": 1.0,
-  "avg_latency_seconds": 433.6987855984614,
-  "avg_total_tokens_per_question": 3377.6153846153848,
-  "total_prompt_tokens": 43245,
-  "total_completion_tokens": 664,
-  "total_tokens_used_all_questions": 43909,
-  "actual_cost_usd": 0.0,
-  "illustrative_cost_usd_if_hosted_api": 0.0136,
-  "note": "Actual cost is $0 (local Ollama inference). The illustrative cost models input tokens at $0.0003/1K and output tokens at $0.0009/1K -- separate rates, since output tokens are typically priced higher by hosted providers -- purely for comparison against a hypothetical hosted API. avg_lexical_grounding_score is a weak proxy measuring vocabulary overlap between the answer and retrieved context -- it is NOT a faithfulness or correctness check, and should be interpreted only as a lightweight signal, not proof of grounding.",
-  "num_scored_answers": 8,
-  "num_lexical_grounding_scored": 8
+  "benchmark": "benchmark_full_120.json",
+  "expected_num_questions": 5,
+  "num_questions_processed": 5,
+  "num_pipeline_errors": 0,
+  "evaluation_complete": true,
+  "judge_enabled": false,
+  "abstention": {
+    "num_evaluated": 5,
+    "accuracy": 1.0,
+    "true_positive": 0,
+    "true_negative": 5,
+    "false_negative": 0,
+    "false_positive": 0,
+    "system_error": 0
+  },
+  "answer_quality": {
+    "num_scored_answers": 5,
+    "average_exact_match": 0.0,
+    "average_f1": 0.4126644,
+    "average_llm_judge_score": null,
+    "num_llm_judge_scores": 0
+  },
+  "citations": {
+    "num_scored_answers": 5,
+    "source_accuracy": 1.0,
+    "note": "Citation source accuracy checks whether at least one structured citation matches the expected source document. Open RAGBench does not provide verified page-level labels."
+  },
+  "grounding": {
+    "num_scored_answers": 5,
+    "average_lexical_grounding_score": 0.7843584,
+    "note": "Lexical grounding is only a vocabulary-overlap proxy. It is not proof of factual correctness or faithfulness."
+  },
+  "latency_seconds": {
+    "average": 10.9181236,
+    "p50": 11.83587,
+    "p95": 12.2522046,
+    "maximum": 12.294619
+  },
+  "tokens": {
+    "num_questions_with_token_data": 5,
+    "average_prompt_tokens": 3104.0,
+    "average_completion_tokens": 82.6,
+    "average_total_tokens_per_question": 3186.6,
+    "total_prompt_tokens": 15520,
+    "total_completion_tokens": 413,
+    "total_tokens": 15933
+  },
+  "cost": {
+    "actual_cost_usd": 0.0,
+    "illustrative_cost_usd_if_hosted_api": 0.005028,
+    "illustrative_input_rate_usd_per_1k_tokens": 0.0003,
+    "illustrative_output_rate_usd_per_1k_tokens": 0.0009,
+    "note": "Actual inference uses local Ollama, so the measured monetary API cost is zero. The hosted cost is illustrative only."
+  },
+  "ground_truth_scope": {
+    "answer_reference": "Open RAGBench reference answer",
+    "citation_relevance": "document-level source",
+    "page_level_labels_available": false
+  }
 }

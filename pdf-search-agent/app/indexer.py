@@ -90,12 +90,37 @@ class Indexer:
         return output
 
     def clear(self) -> None:
-        try:
-            self.client.delete_collection(self.collection_name)
-        except Exception:
-            pass  # collection didn't exist yet — nothing to delete
+        """
+        Removes every chunk from the collection and verifies that the
+        collection is empty afterwards.
 
-        self.collection = self.client.get_or_create_collection(
-            name=self.collection_name,
-            embedding_function=self.embedding_fn
-        )
+        Deleting records directly is safer than silently deleting and
+        recreating the whole collection, especially when the Streamlit
+        application already holds an active ChromaDB client.
+        """
+        batch_size = 1000
+
+        while self.collection.count() > 0:
+            batch = self.collection.get(
+                limit=batch_size,
+                include=[],
+            )
+
+            ids = batch.get("ids", [])
+
+            if not ids:
+                raise RuntimeError(
+                    "ChromaDB reports stored chunks, but no chunk IDs "
+                    "could be retrieved for deletion."
+                )
+
+            self.collection.delete(ids=ids)
+
+        remaining_chunks = self.collection.count()
+
+        if remaining_chunks != 0:
+            raise RuntimeError(
+                f"Failed to clear ChromaDB collection "
+                f"'{self.collection_name}'. "
+                f"{remaining_chunks} chunk(s) remain."
+            )

@@ -1,0 +1,93 @@
+[
+  {
+    "question": "What are the challenges in estimating output impedance in inverter-based grids?",
+    "expected_answer": "Estimating output impedance in inverter-based grids is challenging due to dynamic grid conditions, which require real-time estimation. Traditional methods like signal injection and historical data analysis have limitations, such as sensitivity to noise and complexity.",
+    "expected_source": "2410.14077v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "How does discarding q-axis dynamics affect noise reduction in power networks?",
+    "expected_answer": "Discarding q-axis dynamics improves noise rejection, resulting in lower RMSPE values for resistance and inductance when only d-axis dynamics are used, enhancing estimation accuracy.",
+    "expected_source": "2410.14077v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "How does the MLMM approach affect the analysis of Root Mean Squared Error (RMSE)?",
+    "expected_answer": "The MLMM approach affects the analysis of RMSE by allowing direct modeling through a square root link function. It shows negative average effects on RMSE across conditions, with variability depending on correlation strength and sample size.",
+    "expected_source": "2401.07294v4.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "How can performance metrics typically defined at an aggregate level be evaluated within a multilevel framework?",
+    "expected_answer": "Performance metrics like true standard error or standard error calibration, usually defined at an aggregate level, can still be effectively evaluated within a three-level MLMM framework. This approach allows for added benefits and approximations that enhance inference and interpretability.",
+    "expected_source": "2401.07294v4.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "What is the concept of location-class independence in object detection?",
+    "expected_answer": "Location-class independence in object detection refers to the assumption that the location variable is independent of the class variable, simplifying probability calculations by treating them as separate factors.",
+    "expected_source": "2410.11774v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "Why is post-calibrated softmax adjustment (PCSA) important in handling class imbalances?",
+    "expected_answer": "PCSA is important because it adjusts class imbalances during inference without requiring model retraining, making it a more efficient approach to improving accuracy for both frequent and rare classes.",
+    "expected_source": "2410.11774v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "How does incorporating demographic factors influence job transition predictions using LLMs?",
+    "expected_answer": "Incorporating demographic factors such as gender, ethnicity, and region enhances job transition predictions by providing additional context that influences career paths. These variables help refine the model's understanding of individual differences in occupational trajectories, leading to more accurate forecasts.",
+    "expected_source": "2406.17972v3.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "What is tokenization in the context of large language models (LLMs)?",
+    "expected_answer": "Tokenization is a process where words are transformed into a sequence of tokens.",
+    "expected_source": "2406.17972v3.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "How do traditional feature selection methods for classification work?",
+    "expected_answer": "Traditional feature selection methods for classification typically use data from all classes to select features that are relevant across different classes, rather than focusing on individual class-specific features.",
+    "expected_source": "2412.10128v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "What challenges are associated with high-dimensional data in feature selection?",
+    "expected_answer": "High-dimensional data can lead to increased training time, algorithmic complexity, storage space issues, and noise in datasets. These challenges are collectively known as the 'curse of dimensionality,' which complicates the process of selecting relevant features without losing accuracy.",
+    "expected_source": "2412.10128v2.pdf",
+    "expected_page": null,
+    "should_abstain": false
+  },
+  {
+    "question": "Is utility related to similarity between distributions in expected free energy?",
+    "expected_answer": null,
+    "expected_source": null,
+    "expected_page": null,
+    "should_abstain": true
+  },
+  {
+    "question": "Do the beam patterns exhibit circular symmetry within their $50\\%$ contour?",
+    "expected_answer": null,
+    "expected_source": null,
+    "expected_page": null,
+    "should_abstain": true
+  },
+  {
+    "question": "What is the role of a normalizing flow in NPE?",
+    "expected_answer": null,
+    "expected_source": null,
+    "expected_page": null,
+    "should_abstain": true
+  }
+]

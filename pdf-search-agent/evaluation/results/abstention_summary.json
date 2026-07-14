@@ -3,10 +3,10 @@
   "num_evaluated": 13,
   "num_pipeline_errors": 0,
   "num_system_errors": 0,
-  "abstention_accuracy": 0.8461538461538461,
+  "abstention_accuracy": 0.9230769230769231,
   "true_positive": 3,
-  "true_negative": 8,
+  "true_negative": 9,
   "false_negative": 0,
-  "false_positive": 2,
+  "false_positive": 1,
   "system_error": 0
 }

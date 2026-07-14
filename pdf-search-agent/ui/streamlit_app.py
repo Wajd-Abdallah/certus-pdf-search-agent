@@ -1,21 +1,26 @@
+import html
 import sys
-from pathlib import Path
-from app.pipeline import processPdf, answerQuestion, indexer
-
-# Make sure the project root (parent of ui/) is on the import path,
-# so "from app...." imports work no matter how/where streamlit is launched from.
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-import streamlit as st
 import time
 from datetime import datetime
 from pathlib import Path
 
-from app.pipeline import processPdf, answerQuestion
+# Make sure the project root (parent of ui/) is on the import path,
+# so "from app...." imports work regardless of where Streamlit is started.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
+import streamlit as st
+
+from app.pipeline import answerQuestion, indexer, processPdf
+
+
+# Temporary PDFs uploaded through the Streamlit interface.
+# This directory is separate from permanent sample and benchmark PDFs.
+UPLOAD_DIR = PROJECT_ROOT / "data" / "user_uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 # Basic page setup
 st.set_page_config(
-    page_title="PDF Search Agent",
+    page_title="CERTUS",
     page_icon="📄",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -32,14 +37,19 @@ html, body, [class*="css"] {
 
 /* Sidebar */
 [data-testid="stSidebar"] {
-    background: #56682f;
-    border-right: 1px solid #6a7d3c;
+    background: #36431D;
+    border-right: 1px solid #4a5a28;
 }
-[data-testid="stSidebar"] .stMarkdown,
-[data-testid="stSidebar"] .stMarkdown * {
-    color: #f4f7ea !important;
+/* Sidebar success message */
+[data-testid="stSidebar"] [data-testid="stAlert"] {
+    background: rgba(227, 239, 182, 0.16) !important;
+    border: 1px solid #a9c45f !important;
 }
 
+[data-testid="stSidebar"] [data-testid="stAlert"],
+[data-testid="stSidebar"] [data-testid="stAlert"] * {
+    color: #e3efb6 !important;
+}
 [data-testid="stSidebar"] .stMarkdown h2,
 [data-testid="stSidebar"] .stMarkdown h3 {
     color: #e3efb6 !important;
@@ -166,10 +176,20 @@ html, body, [class*="css"] {
     letter-spacing: 0.04em;
 }
 
-.status-completed { background: #d8edd7; color: #1f5a2f; }
-.status-indexing  { background: #fff2cc; color: #7a5700; }
-.status-error     { background: #f8d7da; color: #721c24; }
+.status-completed {
+    background: #d8edd7;
+    color: #1f5a2f !important;
+}
 
+.status-indexing {
+    background: #fff2cc;
+    color: #7a5700 !important;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24 !important;
+}
 .file-row {
     display: flex;
     justify-content: space-between;
@@ -182,6 +202,9 @@ html, body, [class*="css"] {
 .file-name {
     color: #edf7c8;
     font-weight: 700;
+}
+[data-testid="stImage"] {
+    margin-bottom: 0 !important;
 }
 
 /* Metrics */
@@ -335,7 +358,7 @@ section[data-testid="stFileUploader"] button:disabled {
     unsafe_allow_html=True,
 )
 
-WELCOME_TEXT = "Hey, first upload your PDF. Then ask a question about it, and I’ll answer based on the document."
+WELCOME_TEXT = "Welcome! Upload a PDF to get started. I'll answer only from your document, with citations and I'll say so if I can't find enough evidence."
 
 # Session variables
 if "uploaded_docs" not in st.session_state:
@@ -357,6 +380,15 @@ if "chat_history" not in st.session_state:
 
 if "eval_runs" not in st.session_state:
     st.session_state.eval_runs = []
+
+if "reset_message" not in st.session_state:
+    st.session_state.reset_message = None
+
+if "reset_errors" not in st.session_state:
+    st.session_state.reset_errors = []
+
+if "uploader_version" not in st.session_state:
+    st.session_state.uploader_version = 0
 
 
 def has_indexed_pdf() -> bool:
@@ -380,7 +412,19 @@ def format_backend_answer(result: dict) -> dict:
         "error": None,
     }
 
+def delete_file_safely(file_path: Path) -> str | None:
+    """
+    Deletes a file safely.
 
+    Returns None when deletion succeeds.
+    Returns an error message when deletion fails.
+    """
+    try:
+        file_path.unlink(missing_ok=True)
+        return None
+    except OSError as error:
+        return f"Could not delete {file_path.name}: {error}"
+    
 def process_pdf(uploaded_file):
     file_name = uploaded_file.name
 
@@ -395,13 +439,13 @@ def process_pdf(uploaded_file):
     if not raw_file.startswith(b"%PDF"):
         return False, f"{file_name} is not a valid PDF file."
 
-    upload_dir = Path("data/uploaded_pdfs")
-    upload_dir.mkdir(parents=True, exist_ok=True)
+    # Store Streamlit uploads only in the temporary user-upload directory.
+    safe_path = UPLOAD_DIR / file_name
 
-    safe_path = upload_dir / file_name
-
-    with open(safe_path, "wb") as f:
-        f.write(raw_file)
+    try:
+        safe_path.write_bytes(raw_file)
+    except OSError as error:
+        return False, f"Could not save {file_name}: {error}"
 
     st.session_state.uploaded_docs[file_name] = {
         "status": "indexing",
@@ -413,17 +457,66 @@ def process_pdf(uploaded_file):
 
     result = processPdf(str(safe_path))
 
-    if result["success"]:
+    if result.get("success"):
         st.session_state.uploaded_docs[file_name]["status"] = "completed"
-        st.session_state.uploaded_docs[file_name]["num_chunks"] = result.get("num_chunks", 0)
+        st.session_state.uploaded_docs[file_name]["num_chunks"] = result.get(
+            "num_chunks",
+            0,
+        )
         return True, None
-    else:
-        st.session_state.uploaded_docs[file_name]["status"] = "error"
-        return False, result["message"]
+
+    # The PDF could not be indexed.
+    st.session_state.uploaded_docs[file_name]["status"] = "error"
+    st.session_state.uploaded_docs[file_name]["num_chunks"] = 0
+    st.session_state.uploaded_file_paths.pop(file_name, None)
+
+    deletion_error = delete_file_safely(safe_path)
+
+    error_message = result.get(
+        "message",
+        f"An unknown error occurred while processing {file_name}.",
+    )
+
+    if deletion_error:
+        error_message = f"{error_message} Cleanup warning: {deletion_error}"
+
+    return False, error_message
 
 
-def reset_app():
-    indexer.clear()  # actually wipes the vector database, not just the UI state
+
+def reset_app() -> dict:
+    """
+    Resets the live application.
+
+    This clears:
+    - the live ChromaDB collection,
+    - temporary files from data/user_uploads,
+    - uploaded-document state,
+    - chat history,
+    - the evaluation log.
+
+    It does not affect benchmark PDFs or data/eval_chroma_db.
+    """
+    errors = []
+    deleted_files = []
+
+    try:
+        indexer.clear()
+    except Exception as error:
+        errors.append(f"Could not clear the vector database: {error}")
+
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+    for file_path in UPLOAD_DIR.iterdir():
+        if not file_path.is_file():
+            continue
+
+        deletion_error = delete_file_safely(file_path)
+
+        if deletion_error:
+            errors.append(deletion_error)
+        else:
+            deleted_files.append(file_path.name)
 
     st.session_state.uploaded_docs = {}
     st.session_state.uploaded_file_paths = {}
@@ -438,11 +531,43 @@ def reset_app():
     ]
     st.session_state.eval_runs = []
 
+    # Create a new empty uploader after reset.
+    st.session_state.uploader_version += 1
 
+    return {
+        "success": not errors,
+        "deleted_files": deleted_files,
+        "errors": errors,
+    }
 # Sidebar
 with st.sidebar:
-    st.markdown("##  🤖 PDF Search Agent")
-    st.markdown("---")
+    st.image("ui/assets/logo.png", use_container_width=True)
+    st.markdown(
+        """
+        <div style="
+            color:#e3efb6;
+            font-size:0.92rem;
+            line-height:1.5;
+            margin-top:-0.5rem;
+            margin-bottom:1rem;
+            text-align:center;
+        ">
+            Grounded answers from your documents
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+    if st.session_state.reset_message:
+        st.success(st.session_state.reset_message)
+        st.session_state.reset_message = None
+
+    if st.session_state.reset_errors:
+        for reset_error in st.session_state.reset_errors:
+            st.error(reset_error)
+        st.session_state.reset_errors = []
+
     st.markdown("### Uploaded PDFs")
 
     uploaded_files = st.file_uploader(
@@ -450,6 +575,7 @@ with st.sidebar:
         type=["pdf"],
         accept_multiple_files=True,
         label_visibility="collapsed",
+        key=f"pdf_uploader_{st.session_state.uploader_version}",
     )
 
     if uploaded_files:
@@ -497,18 +623,60 @@ with st.sidebar:
         )
 
     st.markdown("---")
-    if st.button("Reset prototype", use_container_width=True):
-        reset_app()
+
+    if st.button("Start New Session", use_container_width=True):
+        reset_result = reset_app()
+
+        if reset_result["success"]:
+            number_deleted = len(reset_result["deleted_files"])
+
+            st.session_state.reset_message = (
+                "Started a new session successfully."
+                f"Deleted temporary files: {number_deleted}."
+            )
+        else:
+            st.session_state.reset_message = (
+                "The application state was reset, "
+                "but some cleanup operations failed."
+            )
+            st.session_state.reset_errors = reset_result["errors"]
+
         st.rerun()
 
-# Main area
-tab_search, tab_admin = st.tabs(["🔍 Search", "⚙️ Administration & Evaluation"])
+    st.markdown(
+        """
+<div style="
+    position: fixed;
+    bottom: 18px;
+    left: 0;
+    width: 29rem;
+    text-align: center;
+    color: #e3efb6;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+">
+    SEP 2026 · TU Braunschweig
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
+# Main area
+tab_search, tab_admin, tab_help = st.tabs(
+    [
+        "🔍 Ask Questions",
+        "📊 Activity & Metrics",
+        "❓ Help & About",
+    ]
+)
 with tab_search:
     st.markdown(
         """
-<div class="page-title">Document Q&A</div>
-<div class="page-subtitle">Upload a PDF, ask a question, and get an answer grounded in the document.</div>
+<div class="page-title">CERTUS</div>
+<div class="page-subtitle">
+    Reliable document question answering with grounded citations.
+</div>
 """,
         unsafe_allow_html=True,
     )
@@ -661,8 +829,11 @@ with tab_search:
 with tab_admin:
     st.markdown(
         """
-<div class="page-title">Administration & Evaluation Dashboard</div>
-<div class="page-subtitle">Monitor uploaded documents, questions, abstentions, and evaluation data.</div>
+<div class="page-title">Activity & Metrics</div>
+<div class="page-subtitle">
+    Monitor uploaded documents, questions, abstentions, response times,
+    and application activity.
+</div>
 """,
         unsafe_allow_html=True,
     )
@@ -718,8 +889,151 @@ with tab_admin:
         st.info("No evaluation data yet. Ask a question to create the first log entry.")
 
     st.markdown("---")
-    st.subheader("Prototype note")
+    st.subheader("System information")
+
+    info_col1, info_col2, info_col3 = st.columns(3)
+
+    with info_col1:
+        st.markdown(
+            """
+<div class="metric-card">
+    <div class="metric-label">Embedding Model</div>
+    <div style="margin-top:0.7rem;font-weight:700;color:#27310f;">
+        all-MiniLM-L6-v2
+    </div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+    with info_col2:
+        st.markdown(
+            """
+<div class="metric-card">
+    <div class="metric-label">Language Model</div>
+    <div style="margin-top:0.7rem;font-weight:700;color:#27310f;">
+        Llama 3.2 via Ollama
+    </div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+    with info_col3:
+        st.markdown(
+            """
+<div class="metric-card">
+    <div class="metric-label">Vector Database</div>
+    <div style="margin-top:0.7rem;font-weight:700;color:#27310f;">
+        ChromaDB
+    </div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+# ==========================================================
+# Help and about tab
+# ==========================================================
+
+with tab_help:
     st.markdown(
-        '<div class="prototype-note">This version is now connected to the real backend pipeline for PDF processing, indexing, retrieval, answer generation, citations, and abstention handling. The next step is to improve logging, evaluation runs, and configuration-based execution.</div>',
+        """
+<div class="page-title">Help & About</div>
+<div class="page-subtitle">
+    Learn how the PDF Search Agent works and how to interpret its answers.
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    with st.expander("How does the PDF Search Agent work?", expanded=True):
+        st.markdown(
+            """
+The application follows a Retrieval-Augmented Generation pipeline:
+
+1. You upload one or more PDF documents.
+2. The documents are parsed and divided into smaller text chunks.
+3. Each chunk is converted into an embedding and stored in ChromaDB.
+4. When you ask a question, the most relevant chunks are retrieved.
+5. Llama 3.2 generates an answer using only the retrieved document context.
+6. The answer includes citations showing the document and page used.
+"""
+        )
+
+    with st.expander("Why did the system say it could not answer?"):
+        st.markdown(
+            """
+The system abstains when it cannot find enough relevant evidence in the
+uploaded documents.
+
+This is intentional. Instead of guessing or using unsupported external
+knowledge, the agent returns an abstention message. You can try:
+
+- asking the question in a different way,
+- uploading a more relevant document,
+- or checking whether the requested information is actually present.
+"""
+        )
+
+    with st.expander("How should I interpret citations?"):
+        st.markdown(
+            """
+Citations identify the document and page used to support the generated answer.
+
+The system validates generated citations against the chunks that were
+actually retrieved. However, local language models may occasionally produce
+an incomplete or incorrectly formatted citation, especially for long or
+complex answers.
+
+For important information, users should still review the cited page in the
+original PDF.
+"""
+        )
+
+    with st.expander("What happens to uploaded PDF files?"):
+        st.markdown(
+            """
+Files uploaded through the interface are stored temporarily inside:
+
+    data/user_uploads/
+
+The **Start New Session** button:
+
+- removes uploaded files,
+- clears the live ChromaDB collection,
+- clears the conversation,
+- clears the activity log,
+- and resets the file uploader.
+
+Benchmark PDFs and the separate evaluation database are not affected.
+"""
+        )
+
+    with st.expander("What technology powers the application?"):
+        st.markdown(
+            """
+- **PDF parser:** PyMuPDF
+- **Embedding model:** sentence-transformers/all-MiniLM-L6-v2
+- **Vector database:** ChromaDB
+- **Language model:** Llama 3.2
+- **Model runtime:** Ollama
+- **User interface:** Streamlit
+"""
+        )
+
+    st.markdown("---")
+
+    st.markdown(
+     """
+        <div class="prototype-note">
+        This application was developed as part of a university Software
+        Engineering Project at TU Braunschweig. It focuses on reliable, grounded
+        question answering over PDF documents — combining semantic retrieval,
+        citation-backed answers, abstention when evidence is insufficient, and
+        measurable evaluation.
+        </div>
+        """,
         unsafe_allow_html=True,
     )

@@ -1,3 +1,4 @@
+import evaluation._env  # must be first -- points at the same eval_chroma_db used by index_benchmark_pdfs.py
 from app.pipeline import answer_question
 
 questions = [

@@ -1,0 +1,256 @@
+{
+  "success": true,
+  "benchmark_name": "certus_open_ragbench",
+  "benchmark_version": "2.0",
+  "manifest_file": "/Users/wajdabdallah/Documents/Semester4/SEP/code/pdf-search-agent/evaluation/data/benchmark_manifest.json",
+  "pdf_directory": "/Users/wajdabdallah/Documents/Semester4/SEP/code/pdf-search-agent/evaluation/data/open_rag_bench/pdfs",
+  "expected_pdf_count": 60,
+  "indexed_pdf_count": 60,
+  "indexed_files": [
+    {
+      "file": "2401.03305v2.pdf",
+      "num_chunks": 41
+    },
+    {
+      "file": "2401.06987v2.pdf",
+      "num_chunks": 32
+    },
+    {
+      "file": "2401.07294v4.pdf",
+      "num_chunks": 43
+    },
+    {
+      "file": "2401.07317v2.pdf",
+      "num_chunks": 51
+    },
+    {
+      "file": "2401.11899v3.pdf",
+      "num_chunks": 52
+    },
+    {
+      "file": "2401.15478v2.pdf",
+      "num_chunks": 40
+    },
+    {
+      "file": "2401.17469v2.pdf",
+      "num_chunks": 41
+    },
+    {
+      "file": "2402.02272v2.pdf",
+      "num_chunks": 22
+    },
+    {
+      "file": "2402.04429v3.pdf",
+      "num_chunks": 73
+    },
+    {
+      "file": "2402.07527v3.pdf",
+      "num_chunks": 24
+    },
+    {
+      "file": "2402.09721v6.pdf",
+      "num_chunks": 49
+    },
+    {
+      "file": "2402.13385v2.pdf",
+      "num_chunks": 96
+    },
+    {
+      "file": "2403.03363v6.pdf",
+      "num_chunks": 33
+    },
+    {
+      "file": "2403.04102v2.pdf",
+      "num_chunks": 28
+    },
+    {
+      "file": "2403.04635v2.pdf",
+      "num_chunks": 52
+    },
+    {
+      "file": "2403.05373v2.pdf",
+      "num_chunks": 45
+    },
+    {
+      "file": "2403.05821v2.pdf",
+      "num_chunks": 33
+    },
+    {
+      "file": "2403.11010v3.pdf",
+      "num_chunks": 42
+    },
+    {
+      "file": "2403.13015v2.pdf",
+      "num_chunks": 21
+    },
+    {
+      "file": "2403.20331v2.pdf",
+      "num_chunks": 80
+    },
+    {
+      "file": "2404.09796v2.pdf",
+      "num_chunks": 21
+    },
+    {
+      "file": "2404.11929v3.pdf",
+      "num_chunks": 25
+    },
+    {
+      "file": "2404.14603v2.pdf",
+      "num_chunks": 95
+    },
+    {
+      "file": "2404.16760v3.pdf",
+      "num_chunks": 45
+    },
+    {
+      "file": "2404.16880v3.pdf",
+      "num_chunks": 44
+    },
+    {
+      "file": "2404.18137v2.pdf",
+      "num_chunks": 22
+    },
+    {
+      "file": "2404.18501v3.pdf",
+      "num_chunks": 35
+    },
+    {
+      "file": "2405.01155v3.pdf",
+      "num_chunks": 42
+    },
+    {
+      "file": "2405.03910v2.pdf",
+      "num_chunks": 55
+    },
+    {
+      "file": "2405.04904v2.pdf",
+      "num_chunks": 59
+    },
+    {
+      "file": "2405.05734v3.pdf",
+      "num_chunks": 31
+    },
+    {
+      "file": "2405.05998v3.pdf",
+      "num_chunks": 38
+    },
+    {
+      "file": "2405.08806v2.pdf",
+      "num_chunks": 49
+    },
+    {
+      "file": "2405.11284v3.pdf",
+      "num_chunks": 28
+    },
+    {
+      "file": "2405.12292v3.pdf",
+      "num_chunks": 79
+    },
+    {
+      "file": "2405.17070v2.pdf",
+      "num_chunks": 61
+    },
+    {
+      "file": "2405.18521v2.pdf",
+      "num_chunks": 36
+    },
+    {
+      "file": "2405.20415v3.pdf",
+      "num_chunks": 37
+    },
+    {
+      "file": "2405.20936v5.pdf",
+      "num_chunks": 143
+    },
+    {
+      "file": "2406.03044v4.pdf",
+      "num_chunks": 30
+    },
+    {
+      "file": "2406.05923v2.pdf",
+      "num_chunks": 29
+    },
+    {
+      "file": "2406.08366v2.pdf",
+      "num_chunks": 38
+    },
+    {
+      "file": "2406.10343v4.pdf",
+      "num_chunks": 54
+    },
+    {
+      "file": "2406.13337v3.pdf",
+      "num_chunks": 72
+    },
+    {
+      "file": "2406.13839v2.pdf",
+      "num_chunks": 34
+    },
+    {
+      "file": "2406.14174v3.pdf",
+      "num_chunks": 44
+    },
+    {
+      "file": "2406.15341v3.pdf",
+      "num_chunks": 53
+    },
+    {
+      "file": "2406.15888v2.pdf",
+      "num_chunks": 16
+    },
+    {
+      "file": "2406.17374v2.pdf",
+      "num_chunks": 27
+    },
+    {
+      "file": "2406.17972v3.pdf",
+      "num_chunks": 115
+    },
+    {
+      "file": "2406.18052v3.pdf",
+      "num_chunks": 54
+    },
+    {
+      "file": "2407.02507v2.pdf",
+      "num_chunks": 15
+    },
+    {
+      "file": "2407.03285v2.pdf",
+      "num_chunks": 55
+    },
+    {
+      "file": "2409.05184v3.pdf",
+      "num_chunks": 36
+    },
+    {
+      "file": "2411.07030v2.pdf",
+      "num_chunks": 15
+    },
+    {
+      "file": "2412.11037v2.pdf",
+      "num_chunks": 206
+    },
+    {
+      "file": "2412.17866v1.pdf",
+      "num_chunks": 82
+    },
+    {
+      "file": "2412.18386v3.pdf",
+      "num_chunks": 31
+    },
+    {
+      "file": "2412.19506v1.pdf",
+      "num_chunks": 15
+    },
+    {
+      "file": "2501.00058v1.pdf",
+      "num_chunks": 29
+    }
+  ],
+  "reported_total_chunks": 2893,
+  "collection_count": 2893,
+  "average_chunks_per_pdf": 48.22,
+  "collection_name": "pdf_chunks",
+  "persist_directory": "./data/eval_chroma_db"
+}
