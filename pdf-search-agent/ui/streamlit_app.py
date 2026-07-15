@@ -9,6 +9,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+
 import streamlit as st
 
 from app.pipeline import answerQuestion, indexer, processPdf
@@ -541,7 +543,7 @@ def reset_app() -> dict:
     }
 # Sidebar
 with st.sidebar:
-    st.image("ui/assets/logo.png", use_container_width=True)
+    st.image(str(ASSETS_DIR / "logo.png"), use_container_width=True)
     st.markdown(
         """
         <div style="
@@ -671,15 +673,14 @@ tab_search, tab_admin, tab_help = st.tabs(
     ]
 )
 with tab_search:
+    st.image(str(ASSETS_DIR / "logo1.png"), width=200)
     st.markdown(
         """
-<div class="page-title">CERTUS</div>
-<div class="page-subtitle">
-    Reliable document question answering with grounded citations.
-</div>
-""",
+    <div class="page-subtitle">Reliable document question answering with grounded citations.</div>
+    """,
         unsafe_allow_html=True,
     )
+
 
     st.markdown("<div style='height: 13rem;'></div>", unsafe_allow_html=True)
 
