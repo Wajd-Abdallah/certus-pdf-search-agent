@@ -1,0 +1,6 @@
+streamlit
+PyMuPDF==1.24.9
+chromadb
+sentence-transformers
+pyyaml
+ollama
