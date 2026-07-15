@@ -401,6 +401,17 @@ def has_indexed_pdf() -> bool:
 
 
 def format_backend_answer(result: dict) -> dict:
+    abstention_reason = result.get("abstention_reason")
+
+    infra_message = None
+    if abstention_reason == "generation_error":
+        infra_message = (
+            "Answer generation is unavailable in this cloud demo because it "
+            "requires a local Ollama server, which cannot run on Streamlit "
+            "Cloud. Retrieval and citation matching work normally — please "
+            "run the app locally (see the README) for full answer generation."
+        )
+
     return {
         "text": result.get("answer", ""),
         "citations": [
@@ -411,9 +422,10 @@ def format_backend_answer(result: dict) -> dict:
             for citation in result.get("citations", [])
         ],
         "abstain": result.get("abstained", False),
+        "infra_message": infra_message,
         "error": None,
     }
-
+    
 def delete_file_safely(file_path: Path) -> str | None:
     """
     Deletes a file safely.
@@ -696,11 +708,17 @@ with tab_search:
                     f'<div class="chat-agent"><span class="avatar">🤖</span><div class="bubble"><div class="error-box">⚠️ {msg["error"]}</div></div></div>',
                     unsafe_allow_html=True,
                 )
+            elif msg.get("infra_message"):
+                st.markdown(
+                     f'<div class="chat-agent"><span class="avatar">🤖</span><div class="bubble"><div class="abstention-box">ℹ️ {msg["infra_message"]}</div></div></div>',
+                     unsafe_allow_html=True,
+                )
             elif msg.get("abstain"):
                 st.markdown(
                     '<div class="chat-agent"><span class="avatar">🤖</span><div class="bubble"><div class="abstention-box">I could not find enough evidence in the uploaded PDF to answer this question. Please try another question or upload a more relevant document.</div></div></div>',
                     unsafe_allow_html=True,
-                )
+            )
+            
             else:
                 citations_html = ""
                 for citation in msg.get("citations", []):
